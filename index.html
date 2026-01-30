@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HydraForge — Dam Break Simulation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2234;
+    --border: #1e293b;
+    --text: #e2e8f0;
+    --text-dim: #64748b;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.15);
+    --water: #06b6d4;
+    --water-deep: #0891b2;
+    --water-glow: rgba(6, 182, 212, 0.2);
+    --velocity: #f59e0b;
+    --energy: #10b981;
+    --danger: #ef4444;
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(59,130,246,0.05) 0%, transparent 100%);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--water), var(--accent));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text span {
+    color: var(--water);
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  /* Main layout */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    height: calc(100vh - 89px);
+  }
+
+  /* Canvas area */
+  .viz-area {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+  }
+
+  .viz-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .viz-title h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .viz-controls {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn:hover { background: var(--surface2); border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  .btn.primary:hover { background: #2563eb; }
+  .btn.danger { border-color: var(--danger); color: var(--danger); }
+
+  .canvas-wrap {
+    flex: 1;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .canvas-overlay {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    display: flex;
+    gap: 16px;
+  }
+
+  .stat-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  /* Metrics bar */
+  .metrics-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+
+  .metric-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .metric-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .metric-unit {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-dim);
+    margin-left: 2px;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    padding: 24px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .sidebar h3 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .param-group { display: flex; flex-direction: column; gap: 14px; }
+
+  .param {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .param-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .param label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .param-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--water);
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--water);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 8px var(--water-glow);
+  }
+
+  .equation-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text-dim);
+  }
+
+  .equation-box .eq {
+    color: var(--water);
+  }
+
+  .info-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+
+  .info-card .label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-card .value {
+    font-size: 13px;
+    color: var(--text);
+    margin-top: 4px;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid rgba(59,130,246,0.2);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { border-left: none; border-top: 1px solid var(--border); }
+    .metrics-bar { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🌊</div>
+    <div class="logo-text">Hydra<span>Forge</span></div>
+  </div>
+  <div class="badge">BENCHMARK · Classical 1D Dam Break</div>
+</div>
+
+<div class="main">
+  <div class="viz-area">
+    <div class="viz-title">
+      <h2>Shallow Water Simulation</h2>
+      <div class="viz-controls">
+        <button class="btn primary" id="btn-play" onclick="togglePlay()">
+          <span id="play-icon">▶</span> <span id="play-text">Run</span>
+        </button>
+        <button class="btn" onclick="resetSim()">↺ Reset</button>
+        <button class="btn" id="btn-mode" onclick="toggleMode()">Height</button>
+      </div>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="canvas"></canvas>
+      <div class="canvas-overlay">
+        <div class="stat-pill">
+          <div class="stat-dot" style="background:var(--water)"></div>
+          <span id="lbl-time">t = 0.000 s</span>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-dot" style="background:var(--energy)"></div>
+          <span id="lbl-iter">iter 0</span>
+        </div>
+        <div class="stat-pill">
+          <div class="stat-dot" style="background:var(--velocity)"></div>
+          <span id="lbl-cfl">CFL 0.40</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="metrics-bar">
+      <div class="metric-card">
+        <div class="metric-label">Max Height</div>
+        <div class="metric-value" id="m-hmax">0.020<span class="metric-unit">m</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Max Velocity</div>
+        <div class="metric-value" id="m-umax">0.000<span class="metric-unit">m/s</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Total Mass</div>
+        <div class="metric-value" id="m-mass">0.0150<span class="metric-unit">kg/m</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Froude Max</div>
+        <div class="metric-value" id="m-froude">0.000</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div>
+      <h3>Parameters</h3>
+      <div class="param-group">
+        <div class="param">
+          <div class="param-header">
+            <label>Left height (h₁)</label>
+            <span class="param-val" id="pv-hl">0.020 m</span>
+          </div>
+          <input type="range" id="p-hl" min="0.005" max="0.050" step="0.001" value="0.020"
+            oninput="updateParam()">
+        </div>
+        <div class="param">
+          <div class="param-header">
+            <label>Right height (h₂)</label>
+            <span class="param-val" id="pv-hr">0.010 m</span>
+          </div>
+          <input type="range" id="p-hr" min="0.002" max="0.040" step="0.001" value="0.010"
+            oninput="updateParam()">
+        </div>
+        <div class="param">
+          <div class="param-header">
+            <label>Grid cells (Nₓ)</label>
+            <span class="param-val" id="pv-nx">200</span>
+          </div>
+          <input type="range" id="p-nx" min="50" max="500" step="10" value="200"
+            oninput="updateParam()">
+        </div>
+        <div class="param">
+          <div class="param-header">
+            <label>CFL number</label>
+            <span class="param-val" id="pv-cfl">0.40</span>
+          </div>
+          <input type="range" id="p-cfl" min="0.10" max="0.95" step="0.05" value="0.40"
+            oninput="updateParam()">
+        </div>
+        <div class="param">
+          <div class="param-header">
+            <label>Dam position</label>
+            <span class="param-val" id="pv-dam">0.50</span>
+          </div>
+          <input type="range" id="p-dam" min="0.10" max="0.90" step="0.05" value="0.50"
+            oninput="updateParam()">
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <h3>Governing Equations</h3>
+      <div class="equation-box">
+        <span class="eq">h</span><sub>t</sub> + (<span class="eq">hu</span>)<sub>x</sub> = 0<br>
+        (<span class="eq">hu</span>)<sub>t</sub> + (<span class="eq">hu²</span> + ½<span class="eq">gh²</span>)<sub>x</sub> = 0
+      </div>
+    </div>
+
+    <div>
+      <h3>Numerical Method</h3>
+      <div class="info-card">
+        <div class="label">Scheme</div>
+        <div class="value">Godunov Finite Volume (1st order)</div>
+      </div>
+      <div class="info-card" style="margin-top:8px">
+        <div class="label">Riemann Solver</div>
+        <div class="value">HLL (Harten-Lax-van Leer)</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag">Conservative</span>
+        <span class="tag">Shock-capturing</span>
+        <span class="tag">TVD</span>
+      </div>
+    </div>
+
+    <div>
+      <h3>Author</h3>
+      <div class="info-card">
+        <div class="label">Scientist</div>
+        <div class="value">K. A. Ivanova (Ksenya)</div>
+      </div>
+      <div class="info-card" style="margin-top:8px">
+        <div class="label">Reference</div>
+        <div class="value">Toro (2009) §10.3–10.4</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  HydraForge — 1D Shallow Water Solver (JavaScript)
+//  Port of Ksenya's Python HLL/Godunov solver
+// ═══════════════════════════════════════════════════
+
+const G = 9.81;
+const EPS = 1e-8;
+
+let NX, H_L, H_R, CFL, DAM_POS;
+let h, hu, dx;
+let simTime, iteration, running, animId;
+let displayMode = 0; // 0=height, 1=velocity, 2=both
+
+function readParams() {
+  H_L = parseFloat(document.getElementById('p-hl').value);
+  H_R = parseFloat(document.getElementById('p-hr').value);
+  NX = parseInt(document.getElementById('p-nx').value);
+  CFL = parseFloat(document.getElementById('p-cfl').value);
+  DAM_POS = parseFloat(document.getElementById('p-dam').value);
+}
+
+function updateParam() {
+  document.getElementById('pv-hl').textContent = parseFloat(document.getElementById('p-hl').value).toFixed(3) + ' m';
+  document.getElementById('pv-hr').textContent = parseFloat(document.getElementById('p-hr').value).toFixed(3) + ' m';
+  document.getElementById('pv-nx').textContent = document.getElementById('p-nx').value;
+  document.getElementById('pv-cfl').textContent = parseFloat(document.getElementById('p-cfl').value).toFixed(2);
+  document.getElementById('pv-dam').textContent = parseFloat(document.getElementById('p-dam').value).toFixed(2);
+}
+
+function initSim() {
+  readParams();
+  dx = 1.0 / NX;
+  h = new Float64Array(NX + 2);
+  hu = new Float64Array(NX + 2);
+
+  for (let i = 0; i < NX + 2; i++) {
+    const x = (i - 0.5) * dx;
+    h[i] = x < DAM_POS ? H_L : H_R;
+    hu[i] = 0;
+  }
+  applyBC();
+  simTime = 0;
+  iteration = 0;
+}
+
+function applyBC() {
+  h[0] = h[1]; hu[0] = hu[1];
+  h[NX+1] = h[NX]; hu[NX+1] = hu[NX];
+}
+
+function hllFlux(hL, huL, hR, huR) {
+  const uL = Math.abs(hL) > EPS ? huL / hL : 0;
+  const uR = Math.abs(hR) > EPS ? huR / hR : 0;
+  const cL = Math.sqrt(G * Math.max(hL, 0));
+  const cR = Math.sqrt(G * Math.max(hR, 0));
+
+  const sL = Math.min(uL - cL, uR - cR);
+  const sR = Math.max(uL + cL, uR + cR);
+
+  // Physical fluxes
+  const fhL = huL;
+  const fhuL = hL > EPS ? huL * huL / hL + 0.5 * G * hL * hL : 0;
+  const fhR = huR;
+  const fhuR = hR > EPS ? huR * huR / hR + 0.5 * G * hR * hR : 0;
+
+  if (sL >= 0) return [fhL, fhuL];
+  if (sR <= 0) return [fhR, fhuR];
+
+  const denom = sR - sL;
+  return [
+    (sR * fhL - sL * fhR + sL * sR * (hR - hL)) / denom,
+    (sR * fhuL - sL * fhuR + sL * sR * (huR - huL)) / denom
+  ];
+}
+
+function step() {
+  // Compute dt
+  let sMax = EPS;
+  for (let i = 1; i <= NX; i++) {
+    const u = Math.abs(h[i]) > EPS ? Math.abs(hu[i] / h[i]) : 0;
+    const c = Math.sqrt(G * Math.max(h[i], 0));
+    sMax = Math.max(sMax, u + c);
+  }
+  const dt = CFL * dx / sMax;
+
+  // Godunov update
+  const hNew = new Float64Array(NX + 2);
+  const huNew = new Float64Array(NX + 2);
+  hNew.set(h);
+  huNew.set(hu);
+
+  for (let i = 1; i <= NX; i++) {
+    const [fhR, fhuR] = hllFlux(h[i], hu[i], h[i+1], hu[i+1]);
+    const [fhL, fhuL] = hllFlux(h[i-1], hu[i-1], h[i], hu[i]);
+    hNew[i] = h[i] - dt / dx * (fhR - fhL);
+    huNew[i] = hu[i] - dt / dx * (fhuR - fhuL);
+    hNew[i] = Math.max(hNew[i], 0);
+  }
+
+  h = hNew;
+  hu = huNew;
+  applyBC();
+  simTime += dt;
+  iteration++;
+}
+
+// ═══════════════════════════════════════
+//  Rendering
+// ═══════════════════════════════════════
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  const wrap = canvas.parentElement;
+  const w = wrap.clientWidth;
+  const h = wrap.clientHeight;
+  if (w === 0 || h === 0) return;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize);
+
+function draw() {
+  const W = canvas.width / devicePixelRatio;
+  const H = canvas.height / devicePixelRatio;
+  ctx.clearRect(0, 0, W, H);
+
+  const pad = { l: 60, r: 20, t: 50, b: 40 };
+  const pw = W - pad.l - pad.r;
+  const ph = H - pad.t - pad.b;
+
+  // Axes
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t);
+  ctx.lineTo(pad.l, pad.t + ph);
+  ctx.lineTo(pad.l + pw, pad.t + ph);
+  ctx.stroke();
+
+  // Determine y-range
+  let hMax = Math.max(H_L, H_R) * 1.5;
+  let uMax = 0;
+  for (let i = 1; i <= NX; i++) {
+    const u = Math.abs(h[i]) > EPS ? hu[i] / h[i] : 0;
+    uMax = Math.max(uMax, Math.abs(u));
+  }
+  uMax = Math.max(uMax, 0.01) * 1.3;
+
+  // Grid lines
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 0.5;
+  ctx.font = '10px JetBrains Mono, monospace';
+  ctx.fillStyle = '#475569';
+  ctx.textAlign = 'right';
+
+  const nTicks = 5;
+  for (let k = 0; k <= nTicks; k++) {
+    const y = pad.t + ph - (k / nTicks) * ph;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, y);
+    ctx.lineTo(pad.l + pw, y);
+    ctx.stroke();
+
+    const val = (k / nTicks) * hMax;
+    ctx.fillText(val.toFixed(3), pad.l - 8, y + 3);
+  }
+
+  // X labels
+  ctx.textAlign = 'center';
+  for (let k = 0; k <= 4; k++) {
+    const x = pad.l + (k / 4) * pw;
+    const val = k / 4;
+    ctx.fillText(val.toFixed(1), x, pad.t + ph + 16);
+  }
+
+  // Axis labels
+  ctx.fillStyle = '#64748b';
+  ctx.font = '11px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('x [m]', pad.l + pw / 2, pad.t + ph + 34);
+
+  ctx.save();
+  ctx.translate(14, pad.t + ph / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('h [m]', 0, 0);
+  ctx.restore();
+
+  // Water fill (gradient)
+  const waterGrad = ctx.createLinearGradient(0, pad.t, 0, pad.t + ph);
+  waterGrad.addColorStop(0, 'rgba(6, 182, 212, 0.35)');
+  waterGrad.addColorStop(1, 'rgba(6, 182, 212, 0.05)');
+
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t + ph);
+  for (let i = 1; i <= NX; i++) {
+    const x = pad.l + ((i - 0.5) / NX) * pw;
+    const y = pad.t + ph - (h[i] / hMax) * ph;
+    ctx.lineTo(x, y);
+  }
+  ctx.lineTo(pad.l + pw, pad.t + ph);
+  ctx.closePath();
+  ctx.fillStyle = waterGrad;
+  ctx.fill();
+
+  // Water surface line
+  ctx.beginPath();
+  ctx.strokeStyle = '#06b6d4';
+  ctx.lineWidth = 2.5;
+  ctx.shadowColor = 'rgba(6, 182, 212, 0.5)';
+  ctx.shadowBlur = 8;
+  for (let i = 1; i <= NX; i++) {
+    const x = pad.l + ((i - 0.5) / NX) * pw;
+    const y = pad.t + ph - (h[i] / hMax) * ph;
+    if (i === 1) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // Velocity overlay
+  if (displayMode >= 1) {
+    ctx.beginPath();
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    for (let i = 1; i <= NX; i++) {
+      const x = pad.l + ((i - 0.5) / NX) * pw;
+      const u = Math.abs(h[i]) > EPS ? hu[i] / h[i] : 0;
+      const y = pad.t + ph / 2 - (u / uMax) * (ph / 2);
+      if (i === 1) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Velocity scale on right
+    ctx.fillStyle = '#f59e0b';
+    ctx.textAlign = 'left';
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.fillText(`u: ±${uMax.toFixed(2)} m/s`, pad.l + pw - 90, pad.t + 16);
+  }
+
+  // Dam position marker (initial)
+  const damX = pad.l + DAM_POS * pw;
+  ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(damX, pad.t);
+  ctx.lineTo(damX, pad.t + ph);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(239, 68, 68, 0.4)';
+  ctx.font = '10px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('dam', damX, pad.t - 6);
+
+  // Update HUD
+  document.getElementById('lbl-time').textContent = `t = ${simTime.toFixed(4)} s`;
+  document.getElementById('lbl-iter').textContent = `iter ${iteration}`;
+  document.getElementById('lbl-cfl').textContent = `CFL ${CFL.toFixed(2)}`;
+
+  // Metrics
+  let maxH = 0, maxU = 0, totalMass = 0, maxFr = 0;
+  for (let i = 1; i <= NX; i++) {
+    maxH = Math.max(maxH, h[i]);
+    const u = Math.abs(h[i]) > EPS ? Math.abs(hu[i] / h[i]) : 0;
+    maxU = Math.max(maxU, u);
+    totalMass += h[i] * dx;
+    const c = Math.sqrt(G * Math.max(h[i], 0));
+    if (c > EPS) maxFr = Math.max(maxFr, u / c);
+  }
+
+  document.getElementById('m-hmax').innerHTML = `${maxH.toFixed(4)}<span class="metric-unit">m</span>`;
+  document.getElementById('m-umax').innerHTML = `${maxU.toFixed(3)}<span class="metric-unit">m/s</span>`;
+  document.getElementById('m-mass').innerHTML = `${totalMass.toFixed(4)}<span class="metric-unit">kg/m</span>`;
+  document.getElementById('m-froude').innerHTML = `${maxFr.toFixed(3)}`;
+}
+
+// ═══════════════════════════════════════
+//  Controls
+// ═══════════════════════════════════════
+
+function togglePlay() {
+  running = !running;
+  document.getElementById('play-icon').textContent = running ? '⏸' : '▶';
+  document.getElementById('play-text').textContent = running ? 'Pause' : 'Run';
+  if (running) animate();
+}
+
+function resetSim() {
+  running = false;
+  document.getElementById('play-icon').textContent = '▶';
+  document.getElementById('play-text').textContent = 'Run';
+  if (animId) cancelAnimationFrame(animId);
+  initSim();
+  draw();
+}
+
+function toggleMode() {
+  displayMode = (displayMode + 1) % 2;
+  const labels = ['Height', 'Height + Velocity'];
+  document.getElementById('btn-mode').textContent = labels[displayMode];
+  draw();
+}
+
+function animate() {
+  if (!running) return;
+  // Do multiple steps per frame for speed
+  const stepsPerFrame = Math.max(1, Math.floor(NX / 50));
+  for (let s = 0; s < stepsPerFrame; s++) {
+    if (simTime < 0.5) step();
+    else { running = false; document.getElementById('play-icon').textContent = '▶'; document.getElementById('play-text').textContent = 'Run'; break; }
+  }
+  draw();
+  animId = requestAnimationFrame(animate);
+}
+
+// Init — defer to ensure layout is ready
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    resize();
+    initSim();
+    draw();
+  }, 50);
+});
+</script>
+</body>
+</html>
