@@ -7,9 +7,8 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
   :root {
-    --bg: #070b14;
+    --bg: #0a0e17;
     --surface: #0f1724;
-    --surface2: #1a2234;
     --border: #1e293b;
     --text: #e2e8f0;
     --dim: #64748b;
@@ -19,15 +18,13 @@
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); overflow:hidden; height:100%; width:100%; touch-action:none; }
-
   #three-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; }
 
-  /* Header */
   .header {
     position:fixed; top:0; left:0; right:0; z-index:20;
     padding:12px 16px;
     display:flex; align-items:center; justify-content:space-between;
-    background:linear-gradient(180deg, rgba(7,11,20,0.95) 0%, rgba(7,11,20,0.6) 70%, transparent 100%);
+    background:linear-gradient(180deg, rgba(10,14,23,0.95) 0%, rgba(10,14,23,0.5) 70%, transparent 100%);
   }
   .logo { display:flex; align-items:center; gap:8px; }
   .logo-icon { width:32px; height:32px; background:linear-gradient(135deg,var(--water),var(--accent)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
@@ -35,7 +32,6 @@
   .logo-text span { color:var(--water); }
   .badge { font-family:'JetBrains Mono',monospace; font-size:10px; padding:4px 10px; border-radius:6px; background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--dim); white-space:nowrap; }
 
-  /* Panel toggle button (mobile) */
   .panel-toggle {
     position:fixed; top:56px; right:12px; z-index:30;
     width:40px; height:40px; border-radius:10px;
@@ -46,7 +42,6 @@
     cursor:pointer; -webkit-tap-highlight-color:transparent;
   }
 
-  /* Controls panel */
   .panel {
     position:fixed; top:56px; right:12px; width:280px; z-index:20;
     background:rgba(15,23,36,0.92); backdrop-filter:blur(20px);
@@ -71,11 +66,9 @@
   .btn.primary:hover { background:#2563eb; }
 
   .divider { height:1px; background:var(--border); margin:14px 0; }
-
   .eq-box { font-family:'JetBrains Mono',monospace; font-size:11px; line-height:1.8; padding:12px; background:rgba(0,0,0,0.3); border-radius:8px; border:1px solid var(--border); color:var(--dim); }
   .eq-box .eq { color:var(--water); }
 
-  /* Bottom HUD */
   .hud {
     position:fixed; bottom:12px; left:0; right:0; z-index:20;
     display:flex; gap:8px; justify-content:center;
@@ -87,14 +80,12 @@
   .hud-card {
     background:rgba(15,23,36,0.9); backdrop-filter:blur(16px);
     border:1px solid var(--border); border-radius:10px;
-    padding:8px 12px; min-width:90px; text-align:center;
-    flex-shrink:0;
+    padding:8px 12px; min-width:90px; text-align:center; flex-shrink:0;
   }
   .hud-label { font-size:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:var(--dim); margin-bottom:2px; }
   .hud-value { font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:600; }
   .hud-unit { font-size:9px; color:var(--dim); }
 
-  /* Mobile floating action buttons */
   .mobile-actions {
     position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:25;
     display:none; gap:10px;
@@ -104,16 +95,11 @@
     background:rgba(15,23,36,0.92); backdrop-filter:blur(16px);
     box-shadow:0 4px 20px rgba(0,0,0,0.4);
   }
-  .mobile-actions .btn.primary {
-    background:var(--accent);
-    box-shadow:0 4px 20px rgba(59,130,246,0.3);
-  }
+  .mobile-actions .btn.primary { background:var(--accent); box-shadow:0 4px 20px rgba(59,130,246,0.3); }
 
-  /* Info tag */
   .info-tag {
     position:fixed; bottom:12px; right:12px; z-index:20;
-    font-size:9px; color:var(--dim);
-    font-family:'JetBrains Mono',monospace;
+    font-size:9px; color:var(--dim); font-family:'JetBrains Mono',monospace;
   }
 
   @media (max-width: 768px) {
@@ -124,18 +110,15 @@
     .panel-toggle { display:flex; }
     .panel {
       position:fixed; top:auto; bottom:0; left:0; right:0;
-      width:100%; max-width:100%;
-      border-radius:18px 18px 0 0; max-height:65vh;
-      padding:20px 16px;
+      width:100%; max-width:100%; border-radius:18px 18px 0 0;
+      max-height:65vh; padding:20px 16px;
       transform:translateY(100%); opacity:0; pointer-events:none;
     }
     .panel.open { transform:translateY(0); opacity:1; pointer-events:auto; }
     .mobile-actions { display:flex; }
     .hud { bottom:8px; justify-content:flex-start; padding:0 8px; }
     .hud-card { padding:6px 10px; min-width:76px; }
-    .hud-label { font-size:7px; }
-    .hud-value { font-size:13px; }
-    .hud-unit { font-size:8px; }
+    .hud-label { font-size:7px; } .hud-value { font-size:13px; } .hud-unit { font-size:8px; }
     .info-tag { display:none; }
     input[type="range"] { height:8px; }
     input[type="range"]::-webkit-slider-thumb { width:24px; height:24px; }
@@ -145,7 +128,6 @@
     .hud-value { font-size:12px; }
     .mobile-actions .btn { padding:10px 18px; font-size:13px; }
   }
-
   .panel-backdrop {
     position:fixed; top:0; left:0; right:0; bottom:0;
     background:rgba(0,0,0,0.5); z-index:15; display:none;
@@ -155,7 +137,6 @@
 </style>
 </head>
 <body>
-
 <canvas id="three-canvas"></canvas>
 
 <div class="header">
@@ -163,7 +144,7 @@
     <div class="logo-icon">🌊</div>
     <div class="logo-text">Hydra<span>Forge</span></div>
   </div>
-  <div class="badge">3D SIMULATION · Classical 1D Dam Break</div>
+  <div class="badge">SHALLOW WATER EQUATIONS · 1D Dam Break · Godunov FV</div>
 </div>
 
 <button class="panel-toggle" id="panel-toggle" onclick="togglePanel()">⚙</button>
@@ -175,7 +156,6 @@
     <button class="btn primary" id="btn-play-panel" onclick="togglePlay()">▶ Run</button>
     <button class="btn" onclick="resetSim()">↺ Reset</button>
   </div>
-
   <h3>Parameters</h3>
   <div class="param">
     <div class="param-header"><label>Left height h₁</label><span class="param-val" id="pv-hl">0.020 m</span></div>
@@ -201,19 +181,18 @@
     <div class="param-header"><label>Height scale</label><span class="param-val" id="pv-scale">80×</span></div>
     <input type="range" id="p-scale" min="20" max="200" step="5" value="80" oninput="updateParam()">
   </div>
-
   <div class="divider"></div>
-  <h3>Equations</h3>
+  <h3>Governing Equations</h3>
   <div class="eq-box">
-    <span class="eq">h</span><sub>t</sub> + (<span class="eq">hu</span>)<sub>x</sub> = 0<br>
-    (<span class="eq">hu</span>)<sub>t</sub> + (<span class="eq">hu²</span> + ½<span class="eq">gh²</span>)<sub>x</sub> = 0
+    <span class="eq">∂h/∂t</span> + <span class="eq">∂(hu)/∂x</span> = 0<br>
+    <span class="eq">∂(hu)/∂t</span> + <span class="eq">∂(hu² + ½gh²)/∂x</span> = 0
   </div>
-
   <div class="divider"></div>
   <h3>Method</h3>
   <div style="font-size:11px;color:var(--dim);line-height:1.6">
-    Godunov FV · HLL Riemann solver<br>
-    Author: K. A. Ivanova (Ksenya)
+    Godunov finite volume · HLL Riemann solver<br>
+    Adaptive CFL timestep · Transmissive BCs<br><br>
+    <span style="color:var(--text)">Author: K. A. Ivanova</span>
   </div>
 </div>
 
@@ -223,753 +202,411 @@
 </div>
 
 <div class="hud">
-  <div class="hud-card">
-    <div class="hud-label">Time</div>
-    <div class="hud-value" id="h-time">0.000<span class="hud-unit">s</span></div>
-  </div>
-  <div class="hud-card">
-    <div class="hud-label">Max Height</div>
-    <div class="hud-value" id="h-hmax">0.020<span class="hud-unit">m</span></div>
-  </div>
-  <div class="hud-card">
-    <div class="hud-label">Max Vel</div>
-    <div class="hud-value" id="h-umax">0.000<span class="hud-unit">m/s</span></div>
-  </div>
-  <div class="hud-card">
-    <div class="hud-label">Mass</div>
-    <div class="hud-value" id="h-mass">0.015<span class="hud-unit">kg/m</span></div>
-  </div>
-  <div class="hud-card">
-    <div class="hud-label">Iters</div>
-    <div class="hud-value" id="h-iter">0</div>
-  </div>
+  <div class="hud-card"><div class="hud-label">Time</div><div class="hud-value" id="h-time">0.000<span class="hud-unit">s</span></div></div>
+  <div class="hud-card"><div class="hud-label">Max Height</div><div class="hud-value" id="h-hmax">0.020<span class="hud-unit">m</span></div></div>
+  <div class="hud-card"><div class="hud-label">Max Vel</div><div class="hud-value" id="h-umax">0.000<span class="hud-unit">m/s</span></div></div>
+  <div class="hud-card"><div class="hud-label">Mass</div><div class="hud-value" id="h-mass">0.015<span class="hud-unit">kg/m</span></div></div>
+  <div class="hud-card"><div class="hud-label">Steps</div><div class="hud-value" id="h-iter">0</div></div>
 </div>
 
 <div class="info-tag">Drag to orbit · Scroll to zoom</div>
 
 <script type="importmap">
-{
-  "imports": {
+{ "imports": {
     "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
     "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
-  }
-}
+}}
 </script>
 
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-// ═══════════════════════════════
-//  Mobile panel toggle
-// ═══════════════════════════════
+// ── Panel toggle ──
 const panelEl = document.getElementById('panel');
 const backdrop = document.getElementById('panel-backdrop');
 const toggleBtn = document.getElementById('panel-toggle');
 let panelOpen = false;
-window.togglePanel = () => { panelOpen = !panelOpen; panelEl.classList.toggle('open',panelOpen); backdrop.classList.toggle('show',panelOpen); toggleBtn.textContent = panelOpen ? '✕' : '⚙'; };
-window.closePanel = () => { panelOpen = false; panelEl.classList.remove('open'); backdrop.classList.remove('show'); toggleBtn.textContent = '⚙'; };
+window.togglePanel = () => { panelOpen=!panelOpen; panelEl.classList.toggle('open',panelOpen); backdrop.classList.toggle('show',panelOpen); toggleBtn.textContent=panelOpen?'✕':'⚙'; };
+window.closePanel = () => { panelOpen=false; panelEl.classList.remove('open'); backdrop.classList.remove('show'); toggleBtn.textContent='⚙'; };
 
-// ═══════════════════════════════
-//  Solver (HLL/Godunov)
-// ═══════════════════════════════
-const G = 9.81, EPS = 1e-8;
-let NX, H_L, H_R, CFL, DAM_POS, HEIGHT_SCALE;
-let h, hu, dx, simTime, iteration, running = false;
+// ── Solver ──
+const G=9.81, EPS=1e-8;
+let NX,H_L,H_R,CFL,DAM_POS,HEIGHT_SCALE;
+let h,hu,dx,simTime,iteration,running=false;
 
-function readParams() {
-  H_L = +document.getElementById('p-hl').value;
-  H_R = +document.getElementById('p-hr').value;
-  NX = +document.getElementById('p-nx').value;
-  CFL = +document.getElementById('p-cfl').value;
-  DAM_POS = +document.getElementById('p-dam').value;
-  HEIGHT_SCALE = +document.getElementById('p-scale').value;
+function readParams(){
+  H_L=+document.getElementById('p-hl').value; H_R=+document.getElementById('p-hr').value;
+  NX=+document.getElementById('p-nx').value; CFL=+document.getElementById('p-cfl').value;
+  DAM_POS=+document.getElementById('p-dam').value; HEIGHT_SCALE=+document.getElementById('p-scale').value;
 }
-
-window.updateParam = () => {
-  document.getElementById('pv-hl').textContent = (+document.getElementById('p-hl').value).toFixed(3)+' m';
-  document.getElementById('pv-hr').textContent = (+document.getElementById('p-hr').value).toFixed(3)+' m';
-  document.getElementById('pv-nx').textContent = document.getElementById('p-nx').value;
-  document.getElementById('pv-cfl').textContent = (+document.getElementById('p-cfl').value).toFixed(2);
-  document.getElementById('pv-dam').textContent = (+document.getElementById('p-dam').value).toFixed(2);
-  document.getElementById('pv-scale').textContent = document.getElementById('p-scale').value+'×';
-  HEIGHT_SCALE = +document.getElementById('p-scale').value;
+window.updateParam=()=>{
+  document.getElementById('pv-hl').textContent=(+document.getElementById('p-hl').value).toFixed(3)+' m';
+  document.getElementById('pv-hr').textContent=(+document.getElementById('p-hr').value).toFixed(3)+' m';
+  document.getElementById('pv-nx').textContent=document.getElementById('p-nx').value;
+  document.getElementById('pv-cfl').textContent=(+document.getElementById('p-cfl').value).toFixed(2);
+  document.getElementById('pv-dam').textContent=(+document.getElementById('p-dam').value).toFixed(2);
+  document.getElementById('pv-scale').textContent=document.getElementById('p-scale').value+'×';
+  HEIGHT_SCALE=+document.getElementById('p-scale').value;
 };
-
-function initSolver() {
-  readParams();
-  dx = 1.0 / NX;
-  h = new Float64Array(NX + 2);
-  hu = new Float64Array(NX + 2);
-  for (let i = 0; i < NX + 2; i++) {
-    h[i] = ((i - 0.5) * dx < DAM_POS) ? H_L : H_R;
-    hu[i] = 0;
-  }
-  bc(); simTime = 0; iteration = 0;
+function initSolver(){
+  readParams(); dx=1.0/NX;
+  h=new Float64Array(NX+2); hu=new Float64Array(NX+2);
+  for(let i=0;i<NX+2;i++){h[i]=((i-0.5)*dx<DAM_POS)?H_L:H_R; hu[i]=0;}
+  bc(); simTime=0; iteration=0;
 }
-
-function bc() { h[0]=h[1]; hu[0]=hu[1]; h[NX+1]=h[NX]; hu[NX+1]=hu[NX]; }
-
-function hll(hL,huL,hR,huR) {
-  const uL=Math.abs(hL)>EPS?huL/hL:0, uR=Math.abs(hR)>EPS?huR/hR:0;
-  const cL=Math.sqrt(G*Math.max(hL,0)), cR=Math.sqrt(G*Math.max(hR,0));
-  const sL=Math.min(uL-cL,uR-cR), sR=Math.max(uL+cL,uR+cR);
-  const fhL=huL, fhuL=hL>EPS?huL*huL/hL+.5*G*hL*hL:0;
-  const fhR=huR, fhuR=hR>EPS?huR*huR/hR+.5*G*hR*hR:0;
-  if(sL>=0) return [fhL,fhuL];
-  if(sR<=0) return [fhR,fhuR];
+function bc(){h[0]=h[1];hu[0]=hu[1];h[NX+1]=h[NX];hu[NX+1]=hu[NX];}
+function hll(hL,huL,hR,huR){
+  const uL=Math.abs(hL)>EPS?huL/hL:0,uR=Math.abs(hR)>EPS?huR/hR:0;
+  const cL=Math.sqrt(G*Math.max(hL,0)),cR=Math.sqrt(G*Math.max(hR,0));
+  const sL=Math.min(uL-cL,uR-cR),sR=Math.max(uL+cL,uR+cR);
+  const fhL=huL,fhuL=hL>EPS?huL*huL/hL+.5*G*hL*hL:0;
+  const fhR=huR,fhuR=hR>EPS?huR*huR/hR+.5*G*hR*hR:0;
+  if(sL>=0)return[fhL,fhuL]; if(sR<=0)return[fhR,fhuR];
   const d=sR-sL;
-  return [(sR*fhL-sL*fhR+sL*sR*(hR-hL))/d, (sR*fhuL-sL*fhuR+sL*sR*(huR-huL))/d];
+  return[(sR*fhL-sL*fhR+sL*sR*(hR-hL))/d,(sR*fhuL-sL*fhuR+sL*sR*(huR-huL))/d];
 }
-
-function step() {
+function step(){
   let sMax=EPS;
   for(let i=1;i<=NX;i++){const u=Math.abs(h[i])>EPS?Math.abs(hu[i]/h[i]):0;sMax=Math.max(sMax,u+Math.sqrt(G*Math.max(h[i],0)));}
   const dt=CFL*dx/sMax;
-  const hN=new Float64Array(NX+2), huN=new Float64Array(NX+2);
-  hN.set(h); huN.set(hu);
+  const hN=new Float64Array(NX+2),huN=new Float64Array(NX+2);
+  hN.set(h);huN.set(hu);
   for(let i=1;i<=NX;i++){
     const[frh,frhu]=hll(h[i],hu[i],h[i+1],hu[i+1]);
     const[flh,flhu]=hll(h[i-1],hu[i-1],h[i],hu[i]);
-    hN[i]=Math.max(h[i]-dt/dx*(frh-flh),0);
-    huN[i]=hu[i]-dt/dx*(frhu-flhu);
+    hN[i]=Math.max(h[i]-dt/dx*(frh-flh),0); huN[i]=hu[i]-dt/dx*(frhu-flhu);
   }
-  h=hN; hu=huN; bc(); simTime+=dt; iteration++;
+  h=hN;hu=huN;bc();simTime+=dt;iteration++;
 }
 
-// ═══════════════════════════════
-//  Three.js Scene
-// ═══════════════════════════════
-const canvas = document.getElementById('three-canvas');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// ── Three.js ──
+const canvas=document.getElementById('three-canvas');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.1;
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0a1628);
-scene.fog = new THREE.FogExp2(0x0a1628, 0.04);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0a0e17);
+scene.fog=new THREE.FogExp2(0x0a0e17,0.025);
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-const isMobile = window.innerWidth < 768;
-if (isMobile) { camera.position.set(3, 4.5, 5); camera.fov = 55; camera.updateProjectionMatrix(); }
-else { camera.position.set(5, 3.5, 7); }
-camera.lookAt(0, 0.8, 0);
+const camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,100);
+const isMobile=window.innerWidth<768;
+camera.position.set(isMobile?3:5, isMobile?4:3, isMobile?5:6.5);
+if(isMobile){camera.fov=55;camera.updateProjectionMatrix();}
 
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-controls.target.set(0, 0.8, 0);
-controls.maxPolarAngle = Math.PI * 0.48;
-controls.minDistance = 2;
-controls.maxDistance = 20;
-controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
-controls.rotateSpeed = isMobile ? 0.6 : 1.0;
+const controls=new OrbitControls(camera,canvas);
+controls.enableDamping=true; controls.dampingFactor=0.05;
+controls.target.set(0,0.6,0);
+controls.maxPolarAngle=Math.PI*0.48;
+controls.minDistance=2; controls.maxDistance=20;
+controls.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
+controls.rotateSpeed=isMobile?0.6:1.0;
 
-// ═══════════════════════════════
-//  Environment map (procedural)
-// ═══════════════════════════════
-const pmremGen = new THREE.PMREMGenerator(renderer);
-const envScene = new THREE.Scene();
-// Sky gradient
-const skyGeo = new THREE.SphereGeometry(50, 16, 16);
-const skyMat = new THREE.ShaderMaterial({
-  side: THREE.BackSide,
-  uniforms: {
-    topColor: { value: new THREE.Color(0x0a1628) },
-    bottomColor: { value: new THREE.Color(0x1a3a5c) },
-    offset: { value: 5 },
-    exponent: { value: 0.6 }
-  },
-  vertexShader: `varying vec3 vWorldPos; void main(){ vec4 wp=modelMatrix*vec4(position,1.0); vWorldPos=wp.xyz; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
-  fragmentShader: `uniform vec3 topColor; uniform vec3 bottomColor; uniform float offset; uniform float exponent; varying vec3 vWorldPos; void main(){ float h=normalize(vWorldPos+offset).y; gl_FragColor=vec4(mix(bottomColor,topColor,max(pow(max(h,0.0),exponent),0.0)),1.0); }`
+// ── Environment ──
+const pmrem=new THREE.PMREMGenerator(renderer);
+const envScene=new THREE.Scene();
+const skMat=new THREE.ShaderMaterial({
+  side:THREE.BackSide,
+  uniforms:{top:{value:new THREE.Color(0x0a1628)},bot:{value:new THREE.Color(0x1a3a5c)}},
+  vertexShader:`varying vec3 vWP;void main(){vWP=(modelMatrix*vec4(position,1.0)).xyz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+  fragmentShader:`uniform vec3 top,bot;varying vec3 vWP;void main(){float h=normalize(vWP+5.0).y;gl_FragColor=vec4(mix(bot,top,pow(max(h,0.0),0.6)),1.0);}`
 });
-envScene.add(new THREE.Mesh(skyGeo, skyMat));
-// Fake bright spot for reflections
-const spotGeo = new THREE.SphereGeometry(2, 8, 8);
-const spotMat = new THREE.MeshBasicMaterial({ color: 0x4488cc });
-const spot = new THREE.Mesh(spotGeo, spotMat);
-spot.position.set(10, 15, 5);
-envScene.add(spot);
-const envMap = pmremGen.fromScene(envScene, 0.04).texture;
-scene.environment = envMap;
+envScene.add(new THREE.Mesh(new THREE.SphereGeometry(50,16,16),skMat));
+const envSpot=new THREE.Mesh(new THREE.SphereGeometry(3,8,8),new THREE.MeshBasicMaterial({color:0x6699bb}));
+envSpot.position.set(10,20,8);envScene.add(envSpot);
+scene.environment=pmrem.fromScene(envScene,0.04).texture;
 
-// ═══════════════════════════════
-//  Lighting
-// ═══════════════════════════════
-scene.add(new THREE.AmbientLight(0x1a3050, 1.0));
+// ── Lighting ──
+scene.add(new THREE.AmbientLight(0x1a3050,0.8));
+const sun=new THREE.DirectionalLight(0xffeedd,1.8);sun.position.set(8,12,4);scene.add(sun);
+scene.add(new THREE.DirectionalLight(0x06b6d4,0.3).position.set(-5,3,-6)&&scene.children[scene.children.length-1]||new THREE.Object3D());
+const rim=new THREE.DirectionalLight(0x06b6d4,0.3);rim.position.set(-5,3,-6);scene.add(rim);
+const fill=new THREE.DirectionalLight(0x334466,0.3);fill.position.set(-3,1,5);scene.add(fill);
 
-const sun = new THREE.DirectionalLight(0xffeedd, 2.0);
-sun.position.set(8, 12, 4);
-sun.castShadow = true;
-sun.shadow.mapSize.set(1024, 1024);
-sun.shadow.camera.near = 0.5;
-sun.shadow.camera.far = 30;
-sun.shadow.camera.left = -8; sun.shadow.camera.right = 8;
-sun.shadow.camera.top = 8; sun.shadow.camera.bottom = -4;
-scene.add(sun);
+// ── Ground plane ──
+const groundGeo=new THREE.PlaneGeometry(40,40);
+const groundMat=new THREE.MeshStandardMaterial({color:0x0d1220,roughness:0.95,metalness:0.0});
+const ground=new THREE.Mesh(groundGeo,groundMat);
+ground.rotation.x=-Math.PI/2;ground.position.y=-0.01;scene.add(ground);
 
-const rimLight = new THREE.DirectionalLight(0x06b6d4, 0.6);
-rimLight.position.set(-5, 3, -6);
-scene.add(rimLight);
+// ── Measurement grid (subtle) ──
+const grid=new THREE.GridHelper(12,24,0x162030,0x111a28);
+scene.add(grid);
 
-const fillLight = new THREE.DirectionalLight(0x334466, 0.4);
-fillLight.position.set(-3, 1, 5);
-scene.add(fillLight);
-
-// ═══════════════════════════════
-//  Ground — sandy riverbed
-// ═══════════════════════════════
-const groundGeo = new THREE.PlaneGeometry(30, 30, 64, 64);
-// Add subtle noise to ground vertices
-{
-  const gp = groundGeo.attributes.position;
-  for (let i = 0; i < gp.count; i++) {
-    const x = gp.getX(i), y = gp.getY(i);
-    gp.setZ(i, (Math.sin(x*2.3)*Math.cos(y*1.7)*0.03 + Math.sin(x*5.1+y*3.2)*0.01));
-  }
-  groundGeo.computeVertexNormals();
+// ── Scale markers along channel ──
+const markerMat=new THREE.LineBasicMaterial({color:0x2a3a50,transparent:true,opacity:0.5});
+for(let x=-5;x<=5;x+=1){
+  const pts=[new THREE.Vector3(x,0,-1.2),new THREE.Vector3(x,0,-1.05)];
+  const geo=new THREE.BufferGeometry().setFromPoints(pts);
+  scene.add(new THREE.Line(geo,markerMat));
 }
-const groundMat = new THREE.MeshStandardMaterial({
-  color: 0x2a1f14,
-  roughness: 0.95,
-  metalness: 0.0,
+
+// ── Channel edges (thin lines only — no solid walls) ──
+const channelWidth=2.0;
+const edgeLineMat=new THREE.LineBasicMaterial({color:0x2a4060,transparent:true,opacity:0.4});
+function makeChannelEdge(z){
+  const pts=[new THREE.Vector3(-5,0,z),new THREE.Vector3(5,0,z)];
+  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),edgeLineMat));
+  // Top edge (slight height)
+  const pts2=[new THREE.Vector3(-5,0.05,z),new THREE.Vector3(5,0.05,z)];
+  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2),edgeLineMat));
+}
+makeChannelEdge(-channelWidth/2);
+makeChannelEdge(channelWidth/2);
+
+// ── Dam indicator line (fades on run) ──
+let damLineOpacity=1.0;
+const damLineMat=new THREE.LineBasicMaterial({color:0xef4444,transparent:true,opacity:0.6});
+const damLineGeo=new THREE.BufferGeometry();
+const damLine=new THREE.Line(damLineGeo,damLineMat);
+scene.add(damLine);
+function updateDamLine(){
+  const x=-5+DAM_POS*10;
+  const pts=[new THREE.Vector3(x,0,-channelWidth/2),new THREE.Vector3(x,0,channelWidth/2)];
+  damLineGeo.setFromPoints(pts);
+}
+
+// ── Water surface ──
+const MESH_NX=isMobile?120:200;
+const MESH_NZ=isMobile?16:24;
+const waterGeo=new THREE.PlaneGeometry(10,channelWidth,MESH_NX,MESH_NZ);
+waterGeo.rotateX(-Math.PI/2);
+
+const waterMat=new THREE.MeshPhysicalMaterial({
+  color:0x0e7490,
+  roughness:0.02,
+  metalness:0.0,
+  transmission:isMobile?0.5:0.75,
+  thickness:2.0,
+  transparent:true,
+  opacity:0.92,
+  side:THREE.DoubleSide,
+  envMapIntensity:2.5,
+  clearcoat:1.0,
+  clearcoatRoughness:0.05,
+  ior:1.33,
+  attenuationColor:new THREE.Color(0x003040),
+  attenuationDistance:1.5,
+  specularIntensity:1.0,
+  specularColor:new THREE.Color(0xffffff),
 });
-const ground = new THREE.Mesh(groundGeo, groundMat);
-ground.rotation.x = -Math.PI / 2;
-ground.position.y = -0.02;
-ground.receiveShadow = true;
-scene.add(ground);
-
-// Channel bed (lighter sandy color)
-const bedGeo = new THREE.PlaneGeometry(10, 2, 40, 8);
-{
-  const bp = bedGeo.attributes.position;
-  for (let i = 0; i < bp.count; i++) {
-    const x = bp.getX(i), y = bp.getY(i);
-    bp.setZ(i, Math.sin(x*4)*Math.cos(y*3)*0.015 + Math.sin(x*8+y*5)*0.005);
-  }
-  bedGeo.computeVertexNormals();
-}
-const bedMat = new THREE.MeshStandardMaterial({ color: 0x3d2e1f, roughness: 0.9, metalness: 0.0 });
-const bed = new THREE.Mesh(bedGeo, bedMat);
-bed.rotation.x = -Math.PI / 2;
-bed.position.y = 0.0;
-bed.receiveShadow = true;
-scene.add(bed);
-
-// ═══════════════════════════════
-//  Concrete channel walls
-// ═══════════════════════════════
-function makeConcreteTexture(w, h) {
-  const c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  const ctx = c.getContext('2d');
-  // Base concrete grey
-  ctx.fillStyle = '#5a5a5a';
-  ctx.fillRect(0, 0, w, h);
-  // Noise
-  for (let y = 0; y < h; y += 2) {
-    for (let x = 0; x < w; x += 2) {
-      const v = 80 + Math.random() * 30;
-      ctx.fillStyle = `rgb(${v},${v-3},${v-5})`;
-      ctx.fillRect(x, y, 2, 2);
-    }
-  }
-  // Horizontal crack lines
-  ctx.strokeStyle = '#444';
-  ctx.lineWidth = 1;
-  for (let y = 32; y < h; y += 64) {
-    ctx.beginPath();
-    ctx.moveTo(0, y + Math.random() * 4);
-    for (let x = 0; x < w; x += 20) ctx.lineTo(x, y + Math.random() * 6 - 3);
-    ctx.stroke();
-  }
-  return new THREE.CanvasTexture(c);
-}
-
-const concreteTex = makeConcreteTexture(256, 256);
-concreteTex.wrapS = concreteTex.wrapT = THREE.RepeatWrapping;
-concreteTex.repeat.set(3, 1);
-
-const wallHeight = 3.5;
-const wallThickness = 0.15;
-const channelWidth = 2;
-
-const wallMat = new THREE.MeshStandardMaterial({
-  map: concreteTex,
-  roughness: 0.85,
-  metalness: 0.05,
-  color: 0x8a8a8a,
-});
-
-// Left wall (inner face + outer face + top)
-const wallGeo = new THREE.BoxGeometry(10, wallHeight, wallThickness);
-const wallL = new THREE.Mesh(wallGeo, wallMat);
-wallL.position.set(0, wallHeight/2, -(channelWidth/2 + wallThickness/2));
-wallL.castShadow = true;
-wallL.receiveShadow = true;
-scene.add(wallL);
-
-const wallR = new THREE.Mesh(wallGeo, wallMat);
-wallR.position.set(0, wallHeight/2, channelWidth/2 + wallThickness/2);
-wallR.castShadow = true;
-wallR.receiveShadow = true;
-scene.add(wallR);
-
-// Back walls (close the channel ends)
-const endWallGeo = new THREE.BoxGeometry(wallThickness, wallHeight, channelWidth + wallThickness * 2);
-const endL = new THREE.Mesh(endWallGeo, wallMat);
-endL.position.set(-5, wallHeight/2, 0);
-endL.castShadow = true;
-scene.add(endL);
-const endR = new THREE.Mesh(endWallGeo, wallMat);
-endR.position.set(5, wallHeight/2, 0);
-endR.castShadow = true;
-scene.add(endR);
-
-// Wall top caps
-const topCapGeo = new THREE.BoxGeometry(10 + wallThickness * 2, 0.08, wallThickness + 0.06);
-const topCapMat = new THREE.MeshStandardMaterial({ color: 0x666666, roughness: 0.7, metalness: 0.1 });
-const topL = new THREE.Mesh(topCapGeo, topCapMat);
-topL.position.set(0, wallHeight + 0.04, -(channelWidth/2 + wallThickness/2));
-scene.add(topL);
-const topR = new THREE.Mesh(topCapGeo, topCapMat);
-topR.position.set(0, wallHeight + 0.04, channelWidth/2 + wallThickness/2);
-scene.add(topR);
-
-// ═══════════════════════════════
-//  Dam wall (concrete, breaks on Run)
-// ═══════════════════════════════
-const damWallGeo = new THREE.BoxGeometry(0.2, wallHeight, channelWidth);
-const damTex = makeConcreteTexture(128, 256);
-const damWallMat = new THREE.MeshStandardMaterial({
-  map: damTex, roughness: 0.8, metalness: 0.05, color: 0x999999,
-});
-const damWall = new THREE.Mesh(damWallGeo, damWallMat);
-damWall.castShadow = true;
-scene.add(damWall);
-
-// Dam break debris particles
-const DEBRIS_COUNT = 60;
-const debrisGroup = new THREE.Group();
-scene.add(debrisGroup);
-const debrisPieces = [];
-const debrisGeos = [
-  new THREE.BoxGeometry(0.08, 0.12, 0.06),
-  new THREE.BoxGeometry(0.12, 0.08, 0.05),
-  new THREE.BoxGeometry(0.06, 0.06, 0.04),
-];
-const debrisMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.9 });
-for (let i = 0; i < DEBRIS_COUNT; i++) {
-  const geo = debrisGeos[Math.floor(Math.random() * debrisGeos.length)];
-  const m = new THREE.Mesh(geo, debrisMat);
-  m.visible = false;
-  debrisGroup.add(m);
-  debrisPieces.push({
-    mesh: m,
-    vx: (Math.random() - 0.5) * 3,
-    vy: 2 + Math.random() * 4,
-    vz: (Math.random() - 0.5) * 3,
-    rx: Math.random() * 10,
-    ry: Math.random() * 10,
-    rz: Math.random() * 10,
-    life: 0,
-  });
-}
-let debrisActive = false;
-let debrisTime = 0;
-
-function triggerDebris() {
-  const damX = -5 + DAM_POS * 10;
-  debrisActive = true;
-  debrisTime = 0;
-  for (const d of debrisPieces) {
-    d.mesh.visible = true;
-    d.mesh.position.set(damX + (Math.random()-0.5)*0.2, Math.random() * wallHeight, (Math.random()-0.5) * channelWidth * 0.8);
-    d.vx = (Math.random() - 0.5) * 4;
-    d.vy = 1.5 + Math.random() * 5;
-    d.vz = (Math.random() - 0.5) * 4;
-    d.life = 0;
-  }
-}
-
-function updateDebris(dt) {
-  if (!debrisActive) return;
-  debrisTime += dt;
-  let anyAlive = false;
-  for (const d of debrisPieces) {
-    d.life += dt;
-    if (d.life > 3) { d.mesh.visible = false; continue; }
-    anyAlive = true;
-    d.vy -= 9.81 * dt;
-    d.mesh.position.x += d.vx * dt;
-    d.mesh.position.y += d.vy * dt;
-    d.mesh.position.z += d.vz * dt;
-    if (d.mesh.position.y < 0) { d.mesh.position.y = 0; d.vy *= -0.3; d.vx *= 0.8; d.vz *= 0.8; }
-    d.mesh.rotation.x += d.rx * dt;
-    d.mesh.rotation.y += d.ry * dt;
-    d.mesh.rotation.z += d.rz * dt;
-    d.mesh.material.opacity = Math.max(0, 1 - d.life / 3);
-    d.mesh.material.transparent = true;
-  }
-  if (!anyAlive) debrisActive = false;
-}
-
-// ═══════════════════════════════
-//  Water surface
-// ═══════════════════════════════
-const MESH_NX = isMobile ? 120 : 200;
-const MESH_NZ = isMobile ? 12 : 20;
-const waterGeo = new THREE.PlaneGeometry(10, channelWidth, MESH_NX, MESH_NZ);
-waterGeo.rotateX(-Math.PI / 2);
-
-const waterMat = new THREE.MeshPhysicalMaterial({
-  color: 0x1a7a8a,
-  roughness: 0.05,
-  metalness: 0.05,
-  transmission: isMobile ? 0.4 : 0.7,
-  thickness: 1.5,
-  transparent: true,
-  opacity: 0.92,
-  side: THREE.DoubleSide,
-  envMapIntensity: 2.0,
-  clearcoat: 1.0,
-  clearcoatRoughness: 0.1,
-  ior: 1.33,
-  attenuationColor: new THREE.Color(0x003344),
-  attenuationDistance: 2.0,
-  specularIntensity: 1.0,
-  specularColor: new THREE.Color(0xffffff),
-  sheen: 0.1,
-  sheenColor: new THREE.Color(0x88ccdd),
-});
-
-const waterMesh = new THREE.Mesh(waterGeo, waterMat);
-waterMesh.castShadow = true;
-waterMesh.receiveShadow = true;
+const waterMesh=new THREE.Mesh(waterGeo,waterMat);
 scene.add(waterMesh);
 
-// Water front/back face (volume sides)
-function makeWaterSide(zPos, flipNormal) {
-  const geo = new THREE.PlaneGeometry(10, 1, MESH_NX, 10);
-  const mat = new THREE.MeshPhysicalMaterial({
-    color: 0x0d5a6a,
-    roughness: 0.1,
-    metalness: 0.05,
-    transparent: true,
-    opacity: 0.7,
-    side: THREE.DoubleSide,
-    envMapIntensity: 1.0,
-    transmission: 0.3,
-    thickness: 0.5,
+// ── Water volume sides (front/back faces) ──
+function makeVolumeSide(zPos){
+  const geo=new THREE.PlaneGeometry(10,1,MESH_NX,8);
+  const mat=new THREE.MeshPhysicalMaterial({
+    color:0x0a5a6a,roughness:0.05,metalness:0.0,
+    transparent:true,opacity:0.6,side:THREE.DoubleSide,
+    envMapIntensity:1.5,transmission:0.3,thickness:0.8,
+    attenuationColor:new THREE.Color(0x002030),attenuationDistance:2.0,
   });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.z = zPos;
+  const mesh=new THREE.Mesh(geo,mat);mesh.position.z=zPos;
   scene.add(mesh);
-  return { mesh, geo };
+  return {mesh,geo};
 }
+const sideFront=makeVolumeSide(-channelWidth/2);
+const sideBack=makeVolumeSide(channelWidth/2);
 
-const sideFront = makeWaterSide(-channelWidth/2, false);
-const sideBack = makeWaterSide(channelWidth/2, true);
+// ── Water surface highlight line ──
+const hlGeo=new THREE.BufferGeometry();
+const hlPos=new Float32Array((MESH_NX+1)*3);
+hlGeo.setAttribute('position',new THREE.BufferAttribute(hlPos,3));
+const hlMat=new THREE.LineBasicMaterial({color:0x67e8f9,transparent:true,opacity:0.35});
+scene.add(new THREE.Line(hlGeo,hlMat));
 
-// Edge highlight line
-const edgeGeo = new THREE.BufferGeometry();
-const edgePositions = new Float32Array((MESH_NX + 1) * 3);
-edgeGeo.setAttribute('position', new THREE.BufferAttribute(edgePositions, 3));
-const edgeMat = new THREE.LineBasicMaterial({ color: 0x66eeff, linewidth: 2, transparent: true, opacity: 0.6 });
-const edgeLine = new THREE.Line(edgeGeo, edgeMat);
-scene.add(edgeLine);
+// Back edge highlight
+const hlGeo2=new THREE.BufferGeometry();
+const hlPos2=new Float32Array((MESH_NX+1)*3);
+hlGeo2.setAttribute('position',new THREE.BufferAttribute(hlPos2,3));
+scene.add(new THREE.Line(hlGeo2,hlMat));
 
-// ═══════════════════════════════
-//  Foam / spray particles
-// ═══════════════════════════════
-const FOAM_COUNT = isMobile ? 300 : 600;
-const foamGeo = new THREE.BufferGeometry();
-const foamPositions = new Float32Array(FOAM_COUNT * 3);
-const foamSizes = new Float32Array(FOAM_COUNT);
-const foamAlphas = new Float32Array(FOAM_COUNT);
-foamGeo.setAttribute('position', new THREE.BufferAttribute(foamPositions, 3));
-foamGeo.setAttribute('size', new THREE.BufferAttribute(foamSizes, 1));
-foamGeo.setAttribute('alpha', new THREE.BufferAttribute(foamAlphas, 1));
+// ── Velocity color overlay (vertex colors) ──
+const colorAttr=new Float32Array((MESH_NX+1)*(MESH_NZ+1)*3);
+waterGeo.setAttribute('color',new THREE.BufferAttribute(colorAttr,3));
+waterMat.vertexColors=true;
 
-const foamVertShader = `
-  attribute float size;
-  attribute float alpha;
-  varying float vAlpha;
-  void main() {
-    vAlpha = alpha;
-    vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
-    gl_PointSize = size * (200.0 / -mvPos.z);
-    gl_Position = projectionMatrix * mvPos;
-  }
-`;
-const foamFragShader = `
-  varying float vAlpha;
-  void main() {
-    float d = length(gl_PointCoord - 0.5);
-    if (d > 0.5) discard;
-    float a = vAlpha * smoothstep(0.5, 0.2, d);
-    gl_FragColor = vec4(0.85, 0.95, 1.0, a);
-  }
-`;
-const foamMat = new THREE.ShaderMaterial({
-  vertexShader: foamVertShader,
-  fragmentShader: foamFragShader,
-  transparent: true,
-  depthWrite: false,
-  blending: THREE.AdditiveBlending,
+// ── Foam particles ──
+const FOAM_COUNT=isMobile?200:500;
+const foamGeo=new THREE.BufferGeometry();
+const foamPos=new Float32Array(FOAM_COUNT*3);
+const foamSizes=new Float32Array(FOAM_COUNT);
+const foamAlphas=new Float32Array(FOAM_COUNT);
+foamGeo.setAttribute('position',new THREE.BufferAttribute(foamPos,3));
+foamGeo.setAttribute('size',new THREE.BufferAttribute(foamSizes,1));
+foamGeo.setAttribute('alpha',new THREE.BufferAttribute(foamAlphas,1));
+
+const foamShaderMat=new THREE.ShaderMaterial({
+  vertexShader:`attribute float size;attribute float alpha;varying float vA;void main(){vA=alpha;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*(150.0/-mv.z);gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`varying float vA;void main(){float d=length(gl_PointCoord-0.5);if(d>0.5)discard;gl_FragColor=vec4(0.9,0.97,1.0,vA*smoothstep(0.5,0.15,d));}`,
+  transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
 });
-const foamPoints = new THREE.Points(foamGeo, foamMat);
-scene.add(foamPoints);
+scene.add(new THREE.Points(foamGeo,foamShaderMat));
 
-const foamParticles = [];
-for (let i = 0; i < FOAM_COUNT; i++) {
-  foamParticles.push({ x:0, y:-10, z:0, vx:0, vy:0, vz:0, life:0, maxLife:1, size:0.5, active:false });
+const foam=[];
+for(let i=0;i<FOAM_COUNT;i++)foam.push({x:0,y:-10,z:0,vx:0,vy:0,vz:0,life:0,maxLife:1,size:0.3,active:false});
+
+function spawnFoam(x,y,z,intensity){
+  const n=Math.floor(intensity*(isMobile?2:4));
+  for(let c=0;c<n;c++){
+    for(const p of foam){if(!p.active){
+      p.x=x+(Math.random()-0.5)*0.2;p.y=y+Math.random()*0.1;
+      p.z=z+(Math.random()-0.5)*channelWidth*0.7;
+      p.vx=(Math.random()-0.5)*0.8;p.vy=0.3+Math.random()*1.2*intensity;
+      p.vz=(Math.random()-0.5)*0.5;
+      p.life=0;p.maxLife=0.4+Math.random()*0.8;p.size=0.15+Math.random()*0.3;
+      p.active=true;break;
+    }}
+  }
+}
+function updateFoam(dt){
+  for(let i=0;i<FOAM_COUNT;i++){
+    const p=foam[i];
+    if(!p.active){foamPos[i*3+1]=-10;foamAlphas[i]=0;continue;}
+    p.life+=dt;
+    if(p.life>=p.maxLife){p.active=false;foamAlphas[i]=0;foamPos[i*3+1]=-10;continue;}
+    p.vy-=3.0*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;
+    if(p.y<0){p.y=0;p.vy*=-0.15;}
+    foamPos[i*3]=p.x;foamPos[i*3+1]=p.y;foamPos[i*3+2]=p.z;
+    foamSizes[i]=p.size;
+    const f=1-p.life/p.maxLife;foamAlphas[i]=f*f*0.5;
+  }
+  foamGeo.attributes.position.needsUpdate=true;
+  foamGeo.attributes.size.needsUpdate=true;
+  foamGeo.attributes.alpha.needsUpdate=true;
 }
 
-function spawnFoam(x, y, z, intensity) {
-  const count = Math.floor(intensity * (isMobile ? 3 : 6));
-  for (let c = 0; c < count; c++) {
-    for (const p of foamParticles) {
-      if (!p.active) {
-        p.x = x + (Math.random()-0.5)*0.3;
-        p.y = y + Math.random()*0.2;
-        p.z = z + (Math.random()-0.5)*(channelWidth*0.8);
-        p.vx = (Math.random()-0.5)*1.5;
-        p.vy = 0.5 + Math.random()*2.0 * intensity;
-        p.vz = (Math.random()-0.5)*1.0;
-        p.life = 0;
-        p.maxLife = 0.5 + Math.random()*1.0;
-        p.size = 0.3 + Math.random()*0.5;
-        p.active = true;
-        break;
+// ── Color helpers ──
+const colorDeep=new THREE.Color(0x0e5a6a);
+const colorShallow=new THREE.Color(0x22d3ee);
+const colorFast=new THREE.Color(0x60a5fa);
+
+// ── Update mesh ──
+function updateWaterMesh(){
+  const pos=waterGeo.attributes.position;
+  const col=waterGeo.attributes.color;
+  const scale=HEIGHT_SCALE||80;
+  const verts=MESH_NX+1,rows=MESH_NZ+1;
+  const maxH_L=H_L*scale; // for normalizing color
+
+  for(let iz=0;iz<rows;iz++){
+    for(let ix=0;ix<verts;ix++){
+      const idx=iz*verts+ix;
+      const si=Math.min(NX,Math.max(1,Math.round((ix/MESH_NX)*NX)));
+      const height=h[si]*scale;
+      // subtle micro-ripple when running
+      let ripple=0;
+      if(running&&simTime>0.005){
+        const t=performance.now()*0.002;
+        const fx=ix/MESH_NX,fz=iz/MESH_NZ;
+        ripple=Math.sin(fx*60+t)*Math.cos(fz*30+t*0.7)*0.008+Math.sin(fx*120-t*1.5)*0.003;
       }
+      pos.setY(idx,height+ripple);
+
+      // velocity-based color
+      const vel=Math.abs(h[si])>EPS?Math.abs(hu[si]/h[si]):0;
+      const hNorm=Math.min(h[si]*scale/maxH_L,1);
+      const vNorm=Math.min(vel/0.5,1);
+      // blend: deep at height, lighter at thin, blue tint at high velocity
+      const c=colorDeep.clone().lerp(colorShallow,1-hNorm).lerp(colorFast,vNorm*0.3);
+      col.setXYZ(idx,c.r,c.g,c.b);
     }
   }
-}
-
-function updateFoam(dt) {
-  for (let i = 0; i < FOAM_COUNT; i++) {
-    const p = foamParticles[i];
-    if (!p.active) {
-      foamPositions[i*3+1] = -10; foamAlphas[i] = 0;
-      continue;
-    }
-    p.life += dt;
-    if (p.life >= p.maxLife) { p.active = false; foamAlphas[i] = 0; foamPositions[i*3+1] = -10; continue; }
-    p.vy -= 4.0 * dt;
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    p.z += p.vz * dt;
-    if (p.y < 0) { p.y = 0; p.vy *= -0.2; }
-    foamPositions[i*3] = p.x;
-    foamPositions[i*3+1] = p.y;
-    foamPositions[i*3+2] = p.z;
-    foamSizes[i] = p.size;
-    const fade = 1 - p.life / p.maxLife;
-    foamAlphas[i] = fade * fade * 0.8;
-  }
-  foamGeo.attributes.position.needsUpdate = true;
-  foamGeo.attributes.size.needsUpdate = true;
-  foamGeo.attributes.alpha.needsUpdate = true;
-}
-
-// ═══════════════════════════════
-//  Update mesh from solver
-// ═══════════════════════════════
-let prevH = null;
-
-function updateWaterMesh() {
-  const pos = waterGeo.attributes.position;
-  const scale = HEIGHT_SCALE || 80;
-  const verts = MESH_NX + 1;
-  const rows = MESH_NZ + 1;
-
-  for (let iz = 0; iz < rows; iz++) {
-    for (let ix = 0; ix < verts; ix++) {
-      const idx = iz * verts + ix;
-      const solverIdx = Math.min(NX, Math.max(1, Math.round((ix / MESH_NX) * NX)));
-      const height = h[solverIdx] * scale;
-      // Add slight surface ripple when running
-      let ripple = 0;
-      if (running && simTime > 0.01) {
-        const t = performance.now() * 0.003;
-        const fx = ix / MESH_NX;
-        const fz = iz / MESH_NZ;
-        ripple = Math.sin(fx * 40 + t) * Math.cos(fz * 20 + t * 0.7) * 0.015;
-        ripple += Math.sin(fx * 80 - t * 1.3) * 0.008;
-      }
-      pos.setY(idx, height + ripple);
-    }
-  }
-  pos.needsUpdate = true;
+  pos.needsUpdate=true;col.needsUpdate=true;
   waterGeo.computeVertexNormals();
 
-  // Side faces
-  for (const side of [sideFront, sideBack]) {
-    const sp = side.geo.attributes.position;
-    const sVerts = MESH_NX + 1;
-    const sRows = 11;
-    for (let iy = 0; iy < sRows; iy++) {
-      for (let ix = 0; ix < sVerts; ix++) {
-        const idx = iy * sVerts + ix;
-        const solverIdx = Math.min(NX, Math.max(1, Math.round((ix / MESH_NX) * NX)));
-        const topH = h[solverIdx] * scale;
-        const yFrac = iy / (sRows - 1);
-        const x = -5 + (ix / MESH_NX) * 10;
-        sp.setXYZ(idx, x, topH * (1 - yFrac), 0);
+  // Volume sides
+  for(const side of [sideFront,sideBack]){
+    const sp=side.geo.attributes.position;
+    const sv=MESH_NX+1,sr=9;
+    for(let iy=0;iy<sr;iy++){
+      for(let ix=0;ix<sv;ix++){
+        const idx=iy*sv+ix;
+        const si=Math.min(NX,Math.max(1,Math.round((ix/MESH_NX)*NX)));
+        const topH=h[si]*scale;
+        sp.setXYZ(idx,-5+(ix/MESH_NX)*10,topH*(1-iy/(sr-1)),0);
       }
     }
-    sp.needsUpdate = true;
-    side.geo.computeVertexNormals();
+    sp.needsUpdate=true;side.geo.computeVertexNormals();
   }
 
-  // Edge glow
-  const ep = edgeGeo.attributes.position;
-  for (let ix = 0; ix <= MESH_NX; ix++) {
-    const solverIdx = Math.min(NX, Math.max(1, Math.round((ix / MESH_NX) * NX)));
-    const x = -5 + (ix / MESH_NX) * 10;
-    ep.setXYZ(ix, x, h[solverIdx] * scale, -channelWidth/2);
+  // Highlight lines
+  for(let ix=0;ix<=MESH_NX;ix++){
+    const si=Math.min(NX,Math.max(1,Math.round((ix/MESH_NX)*NX)));
+    const x=-5+(ix/MESH_NX)*10;
+    hlPos[ix*3]=x;hlPos[ix*3+1]=h[si]*scale;hlPos[ix*3+2]=-channelWidth/2;
+    hlPos2[ix*3]=x;hlPos2[ix*3+1]=h[si]*scale;hlPos2[ix*3+2]=channelWidth/2;
   }
-  ep.needsUpdate = true;
+  hlGeo.attributes.position.needsUpdate=true;
+  hlGeo2.attributes.position.needsUpdate=true;
 
-  // Foam at wavefront (detect steep gradients)
-  if (running && simTime > 0.005) {
-    for (let i = 2; i < NX; i++) {
-      const grad = Math.abs(h[i+1] - h[i-1]) / (2 * dx);
-      if (grad > 0.15) {
-        const worldX = -5 + (i / NX) * 10;
-        const worldY = h[i] * scale;
-        spawnFoam(worldX, worldY, 0, grad * 3);
+  // Foam at steep gradients
+  if(running&&simTime>0.005){
+    for(let i=2;i<NX;i++){
+      const grad=Math.abs(h[i+1]-h[i-1])/(2*dx);
+      if(grad>0.2){
+        const wx=-5+(i/NX)*10,wy=h[i]*scale;
+        spawnFoam(wx,wy,0,Math.min(grad*2,3));
       }
     }
   }
 
-  // Dam wall
-  const damX = -5 + DAM_POS * 10;
-  if (!running && simTime === 0) {
-    damWall.visible = true;
-    damWall.position.set(damX, wallHeight/2, 0);
-    damWall.scale.set(1, 1, 1);
+  // Dam line fade
+  if(running&&damLineOpacity>0){
+    damLineOpacity=Math.max(0,damLineOpacity-0.03);
+    damLineMat.opacity=damLineOpacity*0.6;
   }
 
   // HUD
-  let maxH=0, maxU=0, mass=0;
-  for(let i=1;i<=NX;i++){
-    maxH=Math.max(maxH,h[i]);
-    const u=Math.abs(h[i])>EPS?Math.abs(hu[i]/h[i]):0;
-    maxU=Math.max(maxU,u);
-    mass+=h[i]*dx;
-  }
+  let mxH=0,mxU=0,mass=0;
+  for(let i=1;i<=NX;i++){mxH=Math.max(mxH,h[i]);const u=Math.abs(h[i])>EPS?Math.abs(hu[i]/h[i]):0;mxU=Math.max(mxU,u);mass+=h[i]*dx;}
   document.getElementById('h-time').innerHTML=simTime.toFixed(3)+'<span class="hud-unit">s</span>';
-  document.getElementById('h-hmax').innerHTML=maxH.toFixed(4)+'<span class="hud-unit">m</span>';
-  document.getElementById('h-umax').innerHTML=maxU.toFixed(3)+'<span class="hud-unit">m/s</span>';
+  document.getElementById('h-hmax').innerHTML=mxH.toFixed(4)+'<span class="hud-unit">m</span>';
+  document.getElementById('h-umax').innerHTML=mxU.toFixed(3)+'<span class="hud-unit">m/s</span>';
   document.getElementById('h-mass').innerHTML=mass.toFixed(4)+'<span class="hud-unit">kg/m</span>';
   document.getElementById('h-iter').textContent=iteration;
 }
 
-// ═══════════════════════════════
-//  Dam break animation
-// ═══════════════════════════════
-let damBreaking = false;
-let damBreakT = 0;
-
-function animateDamBreak(dt) {
-  if (!damBreaking) return;
-  damBreakT += dt;
-  // Dam falls apart over 0.5s
-  const frac = Math.min(damBreakT / 0.5, 1);
-  damWall.position.y = (wallHeight / 2) * (1 - frac * frac);
-  damWall.scale.y = Math.max(0.01, 1 - frac);
-  damWall.material.opacity = 1 - frac;
-  damWall.material.transparent = true;
-  if (frac >= 1) {
-    damWall.visible = false;
-    damBreaking = false;
-  }
-}
-
-// ═══════════════════════════════
-//  Animation loop
-// ═══════════════════════════════
-let lastTime = performance.now();
-
-function animate() {
+// ── Animation loop ──
+let lastTime=performance.now();
+function animate(){
   requestAnimationFrame(animate);
+  const now=performance.now(),dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;
 
-  const now = performance.now();
-  const frameDt = Math.min((now - lastTime) / 1000, 0.05);
-  lastTime = now;
-
-  if (running && simTime < 0.5) {
-    const stepsPerFrame = Math.max(1, Math.floor(NX / (isMobile ? 60 : 40)));
-    for (let s = 0; s < stepsPerFrame; s++) {
-      if (simTime < 0.5) step();
-      else {
-        running = false;
-        document.getElementById('btn-play-panel').textContent = '▶ Run';
-        document.getElementById('btn-play-mobile').textContent = '▶ Run';
-        break;
-      }
+  if(running&&simTime<0.5){
+    const spf=Math.max(1,Math.floor(NX/(isMobile?60:40)));
+    for(let s=0;s<spf;s++){
+      if(simTime<0.5)step();
+      else{running=false;document.getElementById('btn-play-panel').textContent='▶ Run';document.getElementById('btn-play-mobile').textContent='▶ Run';break;}
     }
   }
-
-  updateWaterMesh();
-  animateDamBreak(frameDt);
-  updateDebris(frameDt);
-  updateFoam(frameDt);
-  controls.update();
-  renderer.render(scene, camera);
+  updateWaterMesh();updateFoam(dt);controls.update();
+  renderer.render(scene,camera);
 }
 
-// ═══════════════════════════════
-//  Controls
-// ═══════════════════════════════
-window.togglePlay = () => {
-  if (!running && simTime === 0) {
-    // First run — break the dam!
-    damBreaking = true;
-    damBreakT = 0;
-    triggerDebris();
-  }
-  running = !running;
-  const label = running ? '⏸ Pause' : '▶ Run';
-  document.getElementById('btn-play-panel').textContent = label;
-  document.getElementById('btn-play-mobile').textContent = label;
+// ── Controls ──
+window.togglePlay=()=>{
+  running=!running;
+  const l=running?'⏸ Pause':'▶ Run';
+  document.getElementById('btn-play-panel').textContent=l;
+  document.getElementById('btn-play-mobile').textContent=l;
 };
-
-window.resetSim = () => {
-  running = false;
-  damBreaking = false;
-  damWall.visible = true;
-  damWall.material.opacity = 1;
-  damWall.material.transparent = false;
-  damWall.scale.set(1, 1, 1);
-  for (const d of debrisPieces) d.mesh.visible = false;
-  debrisActive = false;
-  for (const p of foamParticles) p.active = false;
-  document.getElementById('btn-play-panel').textContent = '▶ Run';
-  document.getElementById('btn-play-mobile').textContent = '▶ Run';
-  initSolver();
+window.resetSim=()=>{
+  running=false;damLineOpacity=1.0;damLineMat.opacity=0.6;
+  for(const p of foam)p.active=false;
+  document.getElementById('btn-play-panel').textContent='▶ Run';
+  document.getElementById('btn-play-mobile').textContent='▶ Run';
+  initSolver();updateDamLine();
 };
-
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-
-document.body.addEventListener('touchmove', (e) => {
-  if (e.target === canvas || e.target === document.body) e.preventDefault();
-}, { passive: false });
+window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+document.body.addEventListener('touchmove',(e)=>{if(e.target===canvas||e.target===document.body)e.preventDefault();},{passive:false});
 
 // Init
-initSolver();
-animate();
+initSolver();updateDamLine();animate();
 </script>
 </body>
 </html>
