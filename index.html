@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>HydraForge — 3D Dam Break Simulation</title>
+<title>HydraForge — 3D Shallow Water Simulations</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
   :root {
@@ -43,7 +43,7 @@
   }
 
   .panel {
-    position:fixed; top:56px; right:12px; width:280px; z-index:20;
+    position:fixed; top:56px; right:12px; width:300px; z-index:20;
     background:rgba(15,23,36,0.92); backdrop-filter:blur(20px);
     border:1px solid var(--border); border-radius:14px;
     padding:20px;
@@ -64,6 +64,10 @@
   .btn:active { background:rgba(255,255,255,0.12); transform:scale(0.97); }
   .btn.primary { background:var(--accent); border-color:var(--accent); }
   .btn.primary:hover { background:#2563eb; }
+  .btn.active { background:rgba(6,182,212,0.2); border-color:var(--water); color:var(--water); }
+
+  .sim-selector { display:flex; gap:4px; margin-bottom:16px; flex-wrap:wrap; }
+  .sim-btn { font-size:11px; padding:8px 10px; flex:1; min-width:80px; }
 
   .divider { height:1px; background:var(--border); margin:14px 0; }
   .eq-box { font-family:'JetBrains Mono',monospace; font-size:11px; line-height:1.8; padding:12px; background:rgba(0,0,0,0.3); border-radius:8px; border:1px solid var(--border); color:var(--dim); }
@@ -102,6 +106,9 @@
     font-size:9px; color:var(--dim); font-family:'JetBrains Mono',monospace;
   }
 
+  .param-group { display:none; }
+  .param-group.active { display:block; }
+
   @media (max-width: 768px) {
     .header { padding:10px 12px; }
     .badge { display:none; }
@@ -122,6 +129,7 @@
     .info-tag { display:none; }
     input[type="range"] { height:8px; }
     input[type="range"]::-webkit-slider-thumb { width:24px; height:24px; }
+    .sim-btn { font-size:10px; padding:6px 8px; min-width:70px; }
   }
   @media (max-width: 380px) {
     .hud-card { padding:5px 8px; min-width:66px; }
@@ -144,27 +152,90 @@
     <div class="logo-icon">🌊</div>
     <div class="logo-text">Hydra<span>Forge</span></div>
   </div>
-  <div class="badge">SHALLOW WATER EQUATIONS · 1D Dam Break · Godunov FV</div>
+  <div class="badge" id="header-badge">SHALLOW WATER EQUATIONS · 1D Dam Break · Godunov FV</div>
 </div>
 
 <button class="panel-toggle" id="panel-toggle" onclick="togglePanel()">⚙</button>
 <div class="panel-backdrop" id="panel-backdrop" onclick="closePanel()"></div>
 
 <div class="panel" id="panel">
+  <h3>Simulation Type</h3>
+  <div class="sim-selector">
+    <button class="btn sim-btn active" id="btn-dam" onclick="setSimType('dam')">Dam Break</button>
+    <button class="btn sim-btn" id="btn-roll" onclick="setSimType('roll')">Roll Waves</button>
+    <button class="btn sim-btn" id="btn-jump" onclick="setSimType('jump')">Hydraulic Jump</button>
+  </div>
+
   <h3>Controls</h3>
   <div class="btn-row">
     <button class="btn primary" id="btn-play-panel" onclick="togglePlay()">▶ Run</button>
     <button class="btn" onclick="resetSim()">↺ Reset</button>
   </div>
-  <h3>Parameters</h3>
-  <div class="param">
-    <div class="param-header"><label>Left height h₁</label><span class="param-val" id="pv-hl">0.020 m</span></div>
-    <input type="range" id="p-hl" min="0.005" max="0.060" step="0.001" value="0.020" oninput="updateParam()">
+
+  <!-- Dam Break Parameters -->
+  <div class="param-group active" id="params-dam">
+    <h3>Parameters</h3>
+    <div class="param">
+      <div class="param-header"><label>Left height h₁</label><span class="param-val" id="pv-hl">0.020 m</span></div>
+      <input type="range" id="p-hl" min="0.005" max="0.060" step="0.001" value="0.020" oninput="updateParam()">
+    </div>
+    <div class="param">
+      <div class="param-header"><label>Right height h₂</label><span class="param-val" id="pv-hr">0.010 m</span></div>
+      <input type="range" id="p-hr" min="0.002" max="0.050" step="0.001" value="0.010" oninput="updateParam()">
+    </div>
+    <div class="param">
+      <div class="param-header"><label>Dam position</label><span class="param-val" id="pv-dam">0.50</span></div>
+      <input type="range" id="p-dam" min="0.10" max="0.90" step="0.05" value="0.50" oninput="updateParam()">
+    </div>
   </div>
-  <div class="param">
-    <div class="param-header"><label>Right height h₂</label><span class="param-val" id="pv-hr">0.010 m</span></div>
-    <input type="range" id="p-hr" min="0.002" max="0.050" step="0.001" value="0.010" oninput="updateParam()">
+
+  <!-- Roll Waves Parameters -->
+  <div class="param-group" id="params-roll">
+    <h3>Parameters</h3>
+    <div class="param">
+      <div class="param-header"><label>Base height h₀</label><span class="param-val" id="pv-h0">0.008 m</span></div>
+      <input type="range" id="p-h0" min="0.003" max="0.020" step="0.001" value="0.008" oninput="updateParam()">
+    </div>
+    <div class="param">
+      <div class="param-header"><label>Channel slope θ</label><span class="param-val" id="pv-theta">0.050</span></div>
+      <input type="range" id="p-theta" min="0.010" max="0.150" step="0.005" value="0.050" oninput="updateParam()">
+    </div>
+    <div class="param">
+      <div class="param-header"><label>Friction coeff.</label><span class="param-val" id="pv-fric">0.036</span></div>
+      <input type="range" id="p-fric" min="0.010" max="0.100" step="0.002" value="0.036" oninput="updateParam()">
+    </div>
+    <div class="param">
+      <div class="param-header"><label>Perturbation a</label><span class="param-val" id="pv-pert">0.050</span></div>
+      <input type="range" id="p-pert" min="0.000" max="0.200" step="0.005" value="0.050" oninput="updateParam()">
+    </div>
+    <div class="param">
+      <div class="param-header"><label>Frequency ω</label><span class="param-val" id="pv-omega">6.73</span></div>
+      <input type="range" id="p-omega" min="1.00" max="15.00" step="0.25" value="6.73" oninput="updateParam()">
+    </div>
   </div>
+
+  <!-- Hydraulic Jump Parameters -->
+  <div class="param-group" id="params-jump">
+    <h3>Parameters</h3>
+    <div class="param">
+      <div class="param-header"><label>Upstream height h₁</label><span class="param-val" id="pv-jh1">0.008 m</span></div>
+      <input type="range" id="p-jh1" min="0.003" max="0.020" step="0.001" value="0.008" oninput="updateParam()">
+    </div>
+    <div class="param">
+      <div class="param-header"><label>Downstream height h₂</label><span class="param-val" id="pv-jh2">0.025 m</span></div>
+      <input type="range" id="p-jh2" min="0.010" max="0.060" step="0.001" value="0.025" oninput="updateParam()">
+    </div>
+    <div class="param">
+      <div class="param-header"><label>Jump position</label><span class="param-val" id="pv-jpos">0.30</span></div>
+      <input type="range" id="p-jpos" min="0.10" max="0.70" step="0.05" value="0.30" oninput="updateParam()">
+    </div>
+    <div class="param">
+      <div class="param-header"><label>Inflow velocity</label><span class="param-val" id="pv-jvel">0.50</span></div>
+      <input type="range" id="p-jvel" min="0.20" max="1.50" step="0.05" value="0.50" oninput="updateParam()">
+    </div>
+  </div>
+
+  <!-- Common Parameters -->
   <div class="param">
     <div class="param-header"><label>Grid cells Nₓ</label><span class="param-val" id="pv-nx">200</span></div>
     <input type="range" id="p-nx" min="50" max="500" step="10" value="200" oninput="updateParam()">
@@ -174,16 +245,13 @@
     <input type="range" id="p-cfl" min="0.10" max="0.95" step="0.05" value="0.40" oninput="updateParam()">
   </div>
   <div class="param">
-    <div class="param-header"><label>Dam position</label><span class="param-val" id="pv-dam">0.50</span></div>
-    <input type="range" id="p-dam" min="0.10" max="0.90" step="0.05" value="0.50" oninput="updateParam()">
-  </div>
-  <div class="param">
     <div class="param-header"><label>Height scale</label><span class="param-val" id="pv-scale">80×</span></div>
     <input type="range" id="p-scale" min="20" max="200" step="5" value="80" oninput="updateParam()">
   </div>
+
   <div class="divider"></div>
   <h3>Governing Equations</h3>
-  <div class="eq-box">
+  <div class="eq-box" id="eq-box">
     <span class="eq">∂h/∂t</span> + <span class="eq">∂(hu)/∂x</span> = 0<br>
     <span class="eq">∂(hu)/∂t</span> + <span class="eq">∂(hu² + ½gh²)/∂x</span> = 0
   </div>
@@ -191,7 +259,7 @@
   <h3>Method</h3>
   <div style="font-size:11px;color:var(--dim);line-height:1.6">
     Godunov finite volume · HLL Riemann solver<br>
-    Adaptive CFL timestep · Transmissive BCs<br><br>
+    Adaptive CFL timestep · Variable BCs<br><br>
     <span style="color:var(--text)">Author: K. A. Ivanova</span>
   </div>
 </div>
@@ -205,7 +273,7 @@
   <div class="hud-card"><div class="hud-label">Time</div><div class="hud-value" id="h-time">0.000<span class="hud-unit">s</span></div></div>
   <div class="hud-card"><div class="hud-label">Max Height</div><div class="hud-value" id="h-hmax">0.020<span class="hud-unit">m</span></div></div>
   <div class="hud-card"><div class="hud-label">Max Vel</div><div class="hud-value" id="h-umax">0.000<span class="hud-unit">m/s</span></div></div>
-  <div class="hud-card"><div class="hud-label">Mass</div><div class="hud-value" id="h-mass">0.015<span class="hud-unit">kg/m</span></div></div>
+  <div class="hud-card"><div class="hud-label" id="h-mass-label">Mass</div><div class="hud-value" id="h-mass">0.015<span class="hud-unit">kg/m</span></div></div>
   <div class="hud-card"><div class="hud-label">Steps</div><div class="hud-value" id="h-iter">0</div></div>
 </div>
 
@@ -230,32 +298,162 @@ let panelOpen = false;
 window.togglePanel = () => { panelOpen=!panelOpen; panelEl.classList.toggle('open',panelOpen); backdrop.classList.toggle('show',panelOpen); toggleBtn.textContent=panelOpen?'✕':'⚙'; };
 window.closePanel = () => { panelOpen=false; panelEl.classList.remove('open'); backdrop.classList.remove('show'); toggleBtn.textContent='⚙'; };
 
-// ── Solver ──
+// ── Simulation Types ──
+const SIM_TYPES = { DAM: 'dam', ROLL: 'roll', JUMP: 'jump' };
+let currentSimType = SIM_TYPES.DAM;
+
+// ── Physics Constants ──
 const G=9.81, EPS=1e-8;
-let NX,H_L,H_R,CFL,DAM_POS,HEIGHT_SCALE;
-let h,hu,dx,simTime,iteration,running=false;
+
+// ── Simulation State ──
+let NX, CFL, HEIGHT_SCALE;
+let h, hu, dx, simTime, iteration, running=false;
+
+// Dam Break params
+let H_L, H_R, DAM_POS;
+
+// Roll Waves params (Kseniya Ivanova's solver)
+let H_0, THETA, FRICTION_COEF, PERT_AMP, OMEGA;
+let baseVelocity, baseDischarge;
+
+// Hydraulic Jump params
+let JH_1, JH_2, JUMP_POS, JUMP_VEL;
+
+// ── Boundary Condition Types ──
+const BC_TYPES = {
+  ABSORBING: 0,    // Transmissive (outflow)
+  PERIODIC_INFLOW: 1,  // Time-varying inflow
+  FIXED_INFLOW: 2  // Constant inflow
+};
 
 function readParams(){
-  H_L=+document.getElementById('p-hl').value; H_R=+document.getElementById('p-hr').value;
-  NX=+document.getElementById('p-nx').value; CFL=+document.getElementById('p-cfl').value;
-  DAM_POS=+document.getElementById('p-dam').value; HEIGHT_SCALE=+document.getElementById('p-scale').value;
+  NX=+document.getElementById('p-nx').value;
+  CFL=+document.getElementById('p-cfl').value;
+  HEIGHT_SCALE=+document.getElementById('p-scale').value;
+
+  // Dam Break
+  H_L=+document.getElementById('p-hl').value;
+  H_R=+document.getElementById('p-hr').value;
+  DAM_POS=+document.getElementById('p-dam').value;
+
+  // Roll Waves
+  H_0=+document.getElementById('p-h0').value;
+  THETA=+document.getElementById('p-theta').value;
+  FRICTION_COEF=+document.getElementById('p-fric').value;
+  PERT_AMP=+document.getElementById('p-pert').value;
+  OMEGA=+document.getElementById('p-omega').value;
+
+  // Calculate derived Roll Waves parameters
+  baseVelocity = Math.sqrt(G * H_0 * Math.sin(THETA) / FRICTION_COEF);
+  baseDischarge = H_0 * baseVelocity;
+
+  // Hydraulic Jump
+  JH_1=+document.getElementById('p-jh1').value;
+  JH_2=+document.getElementById('p-jh2').value;
+  JUMP_POS=+document.getElementById('p-jpos').value;
+  JUMP_VEL=+document.getElementById('p-jvel').value;
 }
+
 window.updateParam=()=>{
+  // Update displayed values
   document.getElementById('pv-hl').textContent=(+document.getElementById('p-hl').value).toFixed(3)+' m';
   document.getElementById('pv-hr').textContent=(+document.getElementById('p-hr').value).toFixed(3)+' m';
+  document.getElementById('pv-dam').textContent=(+document.getElementById('p-dam').value).toFixed(2);
+
+  document.getElementById('pv-h0').textContent=(+document.getElementById('p-h0').value).toFixed(3)+' m';
+  document.getElementById('pv-theta').textContent=(+document.getElementById('p-theta').value).toFixed(3);
+  document.getElementById('pv-fric').textContent=(+document.getElementById('p-fric').value).toFixed(3);
+  document.getElementById('pv-pert').textContent=(+document.getElementById('p-pert').value).toFixed(3);
+  document.getElementById('pv-omega').textContent=(+document.getElementById('p-omega').value).toFixed(2);
+
+  document.getElementById('pv-jh1').textContent=(+document.getElementById('p-jh1').value).toFixed(3)+' m';
+  document.getElementById('pv-jh2').textContent=(+document.getElementById('p-jh2').value).toFixed(3)+' m';
+  document.getElementById('pv-jpos').textContent=(+document.getElementById('p-jpos').value).toFixed(2);
+  document.getElementById('pv-jvel').textContent=(+document.getElementById('p-jvel').value).toFixed(2);
+
   document.getElementById('pv-nx').textContent=document.getElementById('p-nx').value;
   document.getElementById('pv-cfl').textContent=(+document.getElementById('p-cfl').value).toFixed(2);
-  document.getElementById('pv-dam').textContent=(+document.getElementById('p-dam').value).toFixed(2);
   document.getElementById('pv-scale').textContent=document.getElementById('p-scale').value+'×';
+
   HEIGHT_SCALE=+document.getElementById('p-scale').value;
+  readParams(); // Recalculate derived values
 };
-function initSolver(){
-  readParams(); dx=1.0/NX;
-  h=new Float64Array(NX+2); hu=new Float64Array(NX+2);
-  for(let i=0;i<NX+2;i++){h[i]=((i-0.5)*dx<DAM_POS)?H_L:H_R; hu[i]=0;}
-  bc(); simTime=0; iteration=0;
+
+// ── Boundary Conditions ──
+function applyBoundaryConditions(){
+  switch(currentSimType){
+    case SIM_TYPES.DAM:
+      // Absorbing BC on both sides (transmissive)
+      h[0]=h[1]; hu[0]=hu[1];
+      h[NX+1]=h[NX]; hu[NX+1]=hu[NX];
+      break;
+
+    case SIM_TYPES.ROLL:
+      // Periodic inflow on left, absorbing on right
+      // Left BC: h[0] = h_0 * (1.0 + a * sin(omega * t))
+      const perturbation = 1.0 + PERT_AMP * Math.sin(OMEGA * simTime);
+      h[0] = H_0 * perturbation;
+      hu[0] = baseDischarge; // Constant discharge Q = h_0 * u_0
+
+      // Right boundary: absorbing (transmissive)
+      h[NX+1]=h[NX]; hu[NX+1]=hu[NX];
+      break;
+
+    case SIM_TYPES.JUMP:
+      // Fixed inflow on left, absorbing on right
+      h[0] = JH_1;
+      hu[0] = JH_1 * JUMP_VEL;
+
+      // Right boundary: absorbing
+      h[NX+1]=h[NX]; hu[NX+1]=hu[NX];
+      break;
+  }
 }
-function bc(){h[0]=h[1];hu[0]=hu[1];h[NX+1]=h[NX];hu[NX+1]=hu[NX];}
+
+function initSolver(){
+  readParams();
+  dx=10.0/NX; // Domain is [-5, 5] = 10m
+  h=new Float64Array(NX+2);
+  hu=new Float64Array(NX+2);
+
+  // Initialize based on simulation type
+  switch(currentSimType){
+    case SIM_TYPES.DAM:
+      for(let i=0;i<NX+2;i++){
+        const x = -5 + (i-0.5)*dx;
+        h[i] = (x < -5 + DAM_POS*10) ? H_L : H_R;
+        hu[i] = 0;
+      }
+      break;
+
+    case SIM_TYPES.ROLL:
+      // Uniform initial condition with small perturbation
+      for(let i=0;i<NX+2;i++){
+        h[i] = H_0 * (1.0 + 0.01 * Math.sin(2*Math.PI*i/NX));
+        hu[i] = baseDischarge;
+      }
+      break;
+
+    case SIM_TYPES.JUMP:
+      // Higher on right (downstream), lower on left (upstream with velocity)
+      for(let i=0;i<NX+2;i++){
+        const x = -5 + (i-0.5)*dx;
+        if(x < -5 + JUMP_POS*10){
+          h[i] = JH_1;
+          hu[i] = JH_1 * JUMP_VEL;
+        } else {
+          h[i] = JH_2;
+          hu[i] = 0;
+        }
+      }
+      break;
+  }
+
+  applyBoundaryConditions();
+  simTime=0;
+  iteration=0;
+}
+
 function hll(hL,huL,hR,huR){
   const uL=Math.abs(hL)>EPS?huL/hL:0,uR=Math.abs(hR)>EPS?huR/hR:0;
   const cL=Math.sqrt(G*Math.max(hL,0)),cR=Math.sqrt(G*Math.max(hR,0));
@@ -266,18 +464,154 @@ function hll(hL,huL,hR,huR){
   const d=sR-sL;
   return[(sR*fhL-sL*fhR+sL*sR*(hR-hL))/d,(sR*fhuL-sL*fhuR+sL*sR*(huR-huL))/d];
 }
+
 function step(){
   let sMax=EPS;
-  for(let i=1;i<=NX;i++){const u=Math.abs(h[i])>EPS?Math.abs(hu[i]/h[i]):0;sMax=Math.max(sMax,u+Math.sqrt(G*Math.max(h[i],0)));}
+  for(let i=0;i<=NX+1;i++){
+    const u=Math.abs(h[i])>EPS?Math.abs(hu[i]/h[i]):0;
+    sMax=Math.max(sMax,u+Math.sqrt(G*Math.max(h[i],0)));
+  }
+
   const dt=CFL*dx/sMax;
   const hN=new Float64Array(NX+2),huN=new Float64Array(NX+2);
-  hN.set(h);huN.set(hu);
+
+  // First update interior cells
   for(let i=1;i<=NX;i++){
     const[frh,frhu]=hll(h[i],hu[i],h[i+1],hu[i+1]);
     const[flh,flhu]=hll(h[i-1],hu[i-1],h[i],hu[i]);
-    hN[i]=Math.max(h[i]-dt/dx*(frh-flh),0); huN[i]=hu[i]-dt/dx*(frhu-flhu);
+
+    // Source terms for Roll Waves (gravity + friction)
+    let source_hu = 0;
+    if(currentSimType === SIM_TYPES.ROLL){
+      const u = Math.abs(h[i])>EPS ? hu[i]/h[i] : 0;
+      const friction = FRICTION_COEF * u * Math.abs(u) / h[i];
+      const gravity = G * THETA;
+      source_hu = gravity - friction;
+    }
+
+    hN[i]=Math.max(h[i]-dt/dx*(frh-flh),0);
+    huN[i]=hu[i]-dt/dx*(frhu-flhu) + dt*source_hu;
   }
-  h=hN;hu=huN;bc();simTime+=dt;iteration++;
+
+  h=hN;hu=huN;
+  applyBoundaryConditions();
+  simTime+=dt;
+  iteration++;
+}
+
+// ── Simulation Type Switching ──
+window.setSimType=(type)=>{
+  currentSimType = type;
+
+  // Update UI buttons
+  document.getElementById('btn-dam').classList.toggle('active', type===SIM_TYPES.DAM);
+  document.getElementById('btn-roll').classList.toggle('active', type===SIM_TYPES.ROLL);
+  document.getElementById('btn-jump').classList.toggle('active', type===SIM_TYPES.JUMP);
+
+  // Show/hide parameter groups
+  document.getElementById('params-dam').classList.toggle('active', type===SIM_TYPES.DAM);
+  document.getElementById('params-roll').classList.toggle('active', type===SIM_TYPES.ROLL);
+  document.getElementById('params-jump').classList.toggle('active', type===SIM_TYPES.JUMP);
+
+  // Update header badge
+  const badges = {
+    [SIM_TYPES.DAM]: 'SHALLOW WATER EQUATIONS · 1D Dam Break · Godunov FV',
+    [SIM_TYPES.ROLL]: 'SHALLOW WATER EQUATIONS · Roll Waves · Periodic Inflow BC',
+    [SIM_TYPES.JUMP]: 'SHALLOW WATER EQUATIONS · Hydraulic Jump · Sub/Super Transition'
+  };
+  document.getElementById('header-badge').textContent = badges[type];
+
+  // Update equations display
+  const eqBoxes = {
+    [SIM_TYPES.DAM]: `<span class="eq">∂h/∂t</span> + <span class="eq">∂(hu)/∂x</span> = 0<br><span class="eq">∂(hu)/∂t</span> + <span class="eq">∂(hu² + ½gh²)/∂x</span> = 0`,
+    [SIM_TYPES.ROLL]: `<span class="eq">∂h/∂t</span> + <span class="eq">∂(hu)/∂x</span> = 0<br><span class="eq">∂(hu)/∂t</span> + <span class="eq">∂(hu² + ½gh²)/∂x</span> = <span class="eq">ghθ - C_f u|u|/h</span>`,
+    [SIM_TYPES.JUMP]: `<span class="eq">∂h/∂t</span> + <span class="eq">∂(hu)/∂x</span> = 0<br><span class="eq">∂(hu)/∂t</span> + <span class="eq">∂(hu² + ½gh²)/∂x</span> = 0<br><span class="eq">Fr₁ > 1 → Fr₂ < 1</span>`
+  };
+  document.getElementById('eq-box').innerHTML = eqBoxes[type];
+
+  // Update HUD label
+  document.getElementById('h-mass-label').textContent = type===SIM_TYPES.ROLL ? 'Discharge' : 'Mass';
+
+  // Update camera position for simulation type
+  updateCameraForSimType();
+
+  // Reset simulation
+  running = false;
+  document.getElementById('btn-play-panel').textContent = '▶ Run';
+  document.getElementById('btn-play-mobile').textContent = '▶ Run';
+  initSolver();
+  updateDamLine();
+  updateWaterMaterial();
+};
+
+function updateCameraForSimType(){
+  const isMobile = window.innerWidth < 768;
+  const duration = 1000;
+  const startPos = camera.position.clone();
+  const startTarget = controls.target.clone();
+
+  let endPos, endTarget;
+
+  switch(currentSimType){
+    case SIM_TYPES.DAM:
+      endPos = new THREE.Vector3(isMobile?3:5, isMobile?4:3, isMobile?5:6.5);
+      endTarget = new THREE.Vector3(0, 0.6, 0);
+      break;
+    case SIM_TYPES.ROLL:
+      // Lower angle for better wave viewing
+      endPos = new THREE.Vector3(isMobile?2:4, isMobile?2.5:2, isMobile?6:8);
+      endTarget = new THREE.Vector3(0, 0.3, 0);
+      break;
+    case SIM_TYPES.JUMP:
+      // Side view for jump visualization
+      endPos = new THREE.Vector3(isMobile?1:2, isMobile?3:2.5, isMobile?7:10);
+      endTarget = new THREE.Vector3(isMobile?-1:-1.5, 0.5, 0);
+      break;
+  }
+
+  // Simple animation
+  const startTime = performance.now();
+  function animateCamera(){
+    const elapsed = performance.now() - startTime;
+    const t = Math.min(elapsed/duration, 1);
+    const ease = t<0.5?2*t*t:-1+(4-2*t)*t;
+
+    camera.position.lerpVectors(startPos, endPos, ease);
+    controls.target.lerpVectors(startTarget, endTarget, ease);
+    controls.update();
+
+    if(t<1) requestAnimationFrame(animateCamera);
+  }
+  animateCamera();
+}
+
+function updateWaterMaterial(){
+  // Different color schemes for each simulation type
+  switch(currentSimType){
+    case SIM_TYPES.DAM:
+      waterMat.color.setHex(0x0e7490);
+      waterMat.attenuationColor.setHex(0x003040);
+      colorDeep.setHex(0x0e5a6a);
+      colorShallow.setHex(0x22d3ee);
+      colorFast.setHex(0x60a5fa);
+      break;
+    case SIM_TYPES.ROLL:
+      // Warmer tones for roll waves
+      waterMat.color.setHex(0x0891b2);
+      waterMat.attenuationColor.setHex(0x002840);
+      colorDeep.setHex(0x0c4a5c);
+      colorShallow.setHex(0x38bdf8);
+      colorFast.setHex(0xa78bfa);
+      break;
+    case SIM_TYPES.JUMP:
+      // More dramatic colors for jump
+      waterMat.color.setHex(0x0d9488);
+      waterMat.attenuationColor.setHex(0x002820);
+      colorDeep.setHex(0x115e59);
+      colorShallow.setHex(0x2dd4bf);
+      colorFast.setHex(0xf472b6);
+      break;
+  }
 }
 
 // ── Three.js ──
@@ -322,7 +656,6 @@ scene.environment=pmrem.fromScene(envScene,0.04).texture;
 // ── Lighting ──
 scene.add(new THREE.AmbientLight(0x1a3050,0.8));
 const sun=new THREE.DirectionalLight(0xffeedd,1.8);sun.position.set(8,12,4);scene.add(sun);
-scene.add(new THREE.DirectionalLight(0x06b6d4,0.3).position.set(-5,3,-6)&&scene.children[scene.children.length-1]||new THREE.Object3D());
 const rim=new THREE.DirectionalLight(0x06b6d4,0.3);rim.position.set(-5,3,-6);scene.add(rim);
 const fill=new THREE.DirectionalLight(0x334466,0.3);fill.position.set(-3,1,5);scene.add(fill);
 
@@ -344,27 +677,42 @@ for(let x=-5;x<=5;x+=1){
   scene.add(new THREE.Line(geo,markerMat));
 }
 
-// ── Channel edges (thin lines only — no solid walls) ──
+// ── Channel edges ──
 const channelWidth=2.0;
 const edgeLineMat=new THREE.LineBasicMaterial({color:0x2a4060,transparent:true,opacity:0.4});
 function makeChannelEdge(z){
   const pts=[new THREE.Vector3(-5,0,z),new THREE.Vector3(5,0,z)];
   scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),edgeLineMat));
-  // Top edge (slight height)
   const pts2=[new THREE.Vector3(-5,0.05,z),new THREE.Vector3(5,0.05,z)];
   scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2),edgeLineMat));
 }
 makeChannelEdge(-channelWidth/2);
 makeChannelEdge(channelWidth/2);
 
-// ── Dam indicator line (fades on run) ──
+// ── Feature indicator line (dam/jump) ──
 let damLineOpacity=1.0;
 const damLineMat=new THREE.LineBasicMaterial({color:0xef4444,transparent:true,opacity:0.6});
 const damLineGeo=new THREE.BufferGeometry();
 const damLine=new THREE.Line(damLineGeo,damLineMat);
 scene.add(damLine);
+
 function updateDamLine(){
-  const x=-5+DAM_POS*10;
+  let x;
+  switch(currentSimType){
+    case SIM_TYPES.DAM:
+      x = -5 + DAM_POS*10;
+      damLineMat.color.setHex(0xef4444);
+      break;
+    case SIM_TYPES.ROLL:
+      // No dam line for roll waves
+      damLineMat.opacity = 0;
+      return;
+    case SIM_TYPES.JUMP:
+      x = -5 + JUMP_POS*10;
+      damLineMat.color.setHex(0x22d3ee);
+      break;
+  }
+  damLineMat.opacity = damLineOpacity * 0.6;
   const pts=[new THREE.Vector3(x,0,-channelWidth/2),new THREE.Vector3(x,0,channelWidth/2)];
   damLineGeo.setFromPoints(pts);
 }
@@ -396,7 +744,7 @@ const waterMat=new THREE.MeshPhysicalMaterial({
 const waterMesh=new THREE.Mesh(waterGeo,waterMat);
 scene.add(waterMesh);
 
-// ── Water volume sides (front/back faces) ──
+// ── Water volume sides ──
 function makeVolumeSide(zPos){
   const geo=new THREE.PlaneGeometry(10,1,MESH_NX,8);
   const mat=new THREE.MeshPhysicalMaterial({
@@ -419,16 +767,20 @@ hlGeo.setAttribute('position',new THREE.BufferAttribute(hlPos,3));
 const hlMat=new THREE.LineBasicMaterial({color:0x67e8f9,transparent:true,opacity:0.35});
 scene.add(new THREE.Line(hlGeo,hlMat));
 
-// Back edge highlight
 const hlGeo2=new THREE.BufferGeometry();
 const hlPos2=new Float32Array((MESH_NX+1)*3);
 hlGeo2.setAttribute('position',new THREE.BufferAttribute(hlPos2,3));
 scene.add(new THREE.Line(hlGeo2,hlMat));
 
-// ── Velocity color overlay (vertex colors) ──
+// ── Velocity color overlay ──
 const colorAttr=new Float32Array((MESH_NX+1)*(MESH_NZ+1)*3);
 waterGeo.setAttribute('color',new THREE.BufferAttribute(colorAttr,3));
 waterMat.vertexColors=true;
+
+// ── Color helpers ──
+const colorDeep=new THREE.Color(0x0e5a6a);
+const colorShallow=new THREE.Color(0x22d3ee);
+const colorFast=new THREE.Color(0x60a5fa);
 
 // ── Foam particles ──
 const FOAM_COUNT=isMobile?200:500;
@@ -480,25 +832,29 @@ function updateFoam(dt){
   foamGeo.attributes.alpha.needsUpdate=true;
 }
 
-// ── Color helpers ──
-const colorDeep=new THREE.Color(0x0e5a6a);
-const colorShallow=new THREE.Color(0x22d3ee);
-const colorFast=new THREE.Color(0x60a5fa);
-
 // ── Update mesh ──
 function updateWaterMesh(){
   const pos=waterGeo.attributes.position;
   const col=waterGeo.attributes.color;
   const scale=HEIGHT_SCALE||80;
   const verts=MESH_NX+1,rows=MESH_NZ+1;
-  const maxH_L=H_L*scale; // for normalizing color
+
+  // Reference height for normalization
+  let refH = 0.02;
+  switch(currentSimType){
+    case SIM_TYPES.DAM: refH = Math.max(H_L, H_R); break;
+    case SIM_TYPES.ROLL: refH = H_0 * 1.2; break;
+    case SIM_TYPES.JUMP: refH = Math.max(JH_1, JH_2); break;
+  }
+  const maxH_L = refH * scale;
 
   for(let iz=0;iz<rows;iz++){
     for(let ix=0;ix<verts;ix++){
       const idx=iz*verts+ix;
       const si=Math.min(NX,Math.max(1,Math.round((ix/MESH_NX)*NX)));
       const height=h[si]*scale;
-      // subtle micro-ripple when running
+
+      // Subtle micro-ripple when running
       let ripple=0;
       if(running&&simTime>0.005){
         const t=performance.now()*0.002;
@@ -510,9 +866,8 @@ function updateWaterMesh(){
       // velocity-based color
       const vel=Math.abs(h[si])>EPS?Math.abs(hu[si]/h[si]):0;
       const hNorm=Math.min(h[si]*scale/maxH_L,1);
-      const vNorm=Math.min(vel/0.5,1);
-      // blend: deep at height, lighter at thin, blue tint at high velocity
-      const c=colorDeep.clone().lerp(colorShallow,1-hNorm).lerp(colorFast,vNorm*0.3);
+      const vNorm=Math.min(vel/1.5,1);
+      const c=colorDeep.clone().lerp(colorShallow,1-hNorm).lerp(colorFast,vNorm*0.5);
       col.setXYZ(idx,c.r,c.g,c.b);
     }
   }
@@ -548,26 +903,38 @@ function updateWaterMesh(){
   if(running&&simTime>0.005){
     for(let i=2;i<NX;i++){
       const grad=Math.abs(h[i+1]-h[i-1])/(2*dx);
-      if(grad>0.2){
+      if(grad>0.15){
         const wx=-5+(i/NX)*10,wy=h[i]*scale;
         spawnFoam(wx,wy,0,Math.min(grad*2,3));
       }
     }
   }
 
-  // Dam line fade
+  // Dam/jump line fade
   if(running&&damLineOpacity>0){
     damLineOpacity=Math.max(0,damLineOpacity-0.03);
     damLineMat.opacity=damLineOpacity*0.6;
   }
 
-  // HUD
-  let mxH=0,mxU=0,mass=0;
-  for(let i=1;i<=NX;i++){mxH=Math.max(mxH,h[i]);const u=Math.abs(h[i])>EPS?Math.abs(hu[i]/h[i]):0;mxU=Math.max(mxU,u);mass+=h[i]*dx;}
+  // HUD updates
+  let mxH=0,mxU=0,mass=0, discharge=0;
+  for(let i=1;i<=NX;i++){
+    mxH=Math.max(mxH,h[i]);
+    const u=Math.abs(h[i])>EPS?Math.abs(hu[i]/h[i]):0;
+    mxU=Math.max(mxU,u);
+    mass+=h[i]*dx;
+    discharge+=Math.abs(hu[i])*dx;
+  }
+
   document.getElementById('h-time').innerHTML=simTime.toFixed(3)+'<span class="hud-unit">s</span>';
   document.getElementById('h-hmax').innerHTML=mxH.toFixed(4)+'<span class="hud-unit">m</span>';
   document.getElementById('h-umax').innerHTML=mxU.toFixed(3)+'<span class="hud-unit">m/s</span>';
-  document.getElementById('h-mass').innerHTML=mass.toFixed(4)+'<span class="hud-unit">kg/m</span>';
+
+  if(currentSimType === SIM_TYPES.ROLL){
+    document.getElementById('h-mass').innerHTML=discharge.toFixed(4)+'<span class="hud-unit">m²/s</span>';
+  } else {
+    document.getElementById('h-mass').innerHTML=mass.toFixed(4)+'<span class="hud-unit">kg/m</span>';
+  }
   document.getElementById('h-iter').textContent=iteration;
 }
 
@@ -577,14 +944,23 @@ function animate(){
   requestAnimationFrame(animate);
   const now=performance.now(),dt=Math.min((now-lastTime)/1000,0.05);lastTime=now;
 
-  if(running&&simTime<0.5){
+  // Run simulation steps
+  if(running){
     const spf=Math.max(1,Math.floor(NX/(isMobile?60:40)));
     for(let s=0;s<spf;s++){
-      if(simTime<0.5)step();
-      else{running=false;document.getElementById('btn-play-panel').textContent='▶ Run';document.getElementById('btn-play-mobile').textContent='▶ Run';break;}
+      step();
+      if(currentSimType === SIM_TYPES.DAM && simTime >= 0.5){
+        running = false;
+        document.getElementById('btn-play-panel').textContent='▶ Run';
+        document.getElementById('btn-play-mobile').textContent='▶ Run';
+        break;
+      }
     }
   }
-  updateWaterMesh();updateFoam(dt);controls.update();
+
+  updateWaterMesh();
+  updateFoam(dt);
+  controls.update();
   renderer.render(scene,camera);
 }
 
@@ -595,18 +971,33 @@ window.togglePlay=()=>{
   document.getElementById('btn-play-panel').textContent=l;
   document.getElementById('btn-play-mobile').textContent=l;
 };
+
 window.resetSim=()=>{
-  running=false;damLineOpacity=1.0;damLineMat.opacity=0.6;
+  running=false;
+  damLineOpacity=1.0;
+  damLineMat.opacity=0.6;
   for(const p of foam)p.active=false;
   document.getElementById('btn-play-panel').textContent='▶ Run';
   document.getElementById('btn-play-mobile').textContent='▶ Run';
-  initSolver();updateDamLine();
+  initSolver();
+  updateDamLine();
 };
-window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
-document.body.addEventListener('touchmove',(e)=>{if(e.target===canvas||e.target===document.body)e.preventDefault();},{passive:false});
+
+window.addEventListener('resize',()=>{
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+document.body.addEventListener('touchmove',(e)=>{
+  if(e.target===canvas||e.target===document.body)e.preventDefault();
+},{passive:false});
 
 // Init
-initSolver();updateDamLine();animate();
+initSolver();
+updateDamLine();
+updateWaterMaterial();
+animate();
 </script>
 </body>
 </html>
