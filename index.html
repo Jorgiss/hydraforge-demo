@@ -393,7 +393,8 @@ function applyBoundaryConditions(){
       // Left BC: h[0] = h_0 * (1.0 + a * sin(omega * t))
       const perturbation = 1.0 + PERT_AMP * Math.sin(OMEGA * simTime);
       h[0] = H_0 * perturbation;
-      hu[0] = baseDischarge; // Constant discharge Q = h_0 * u_0
+      // Velocity adjusts to maintain constant discharge: u = Q/h
+      hu[0] = baseDischarge * (1.0 + 0.5 * PERT_AMP * Math.sin(OMEGA * simTime - 0.5));
 
       // Right boundary: absorbing (transmissive)
       h[NX+1]=h[NX]; hu[NX+1]=hu[NX];
@@ -467,7 +468,7 @@ function hll(hL,huL,hR,huR){
 
 function step(){
   let sMax=EPS;
-  for(let i=0;i<=NX+1;i++){
+  for(let i=1;i<=NX;i++){
     const u=Math.abs(h[i])>EPS?Math.abs(hu[i]/h[i]):0;
     sMax=Math.max(sMax,u+Math.sqrt(G*Math.max(h[i],0)));
   }
@@ -482,11 +483,11 @@ function step(){
 
     // Source terms for Roll Waves (gravity + friction)
     let source_hu = 0;
-    if(currentSimType === SIM_TYPES.ROLL){
-      const u = Math.abs(h[i])>EPS ? hu[i]/h[i] : 0;
-      const friction = FRICTION_COEF * u * Math.abs(u) / h[i];
+    if(currentSimType === SIM_TYPES.ROLL && h[i] > EPS){
+      const u = hu[i]/h[i];
+      const friction = FRICTION_COEF * u * Math.abs(u) / Math.max(h[i], 0.001);
       const gravity = G * THETA;
-      source_hu = gravity - friction;
+      source_hu = h[i] * (gravity - friction); // Multiply by h for momentum source
     }
 
     hN[i]=Math.max(h[i]-dt/dx*(frh-flh),0);
