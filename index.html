@@ -950,7 +950,7 @@ function animate(){
     const spf=Math.max(1,Math.floor(NX/(isMobile?60:40)));
     for(let s=0;s<spf;s++){
       step();
-      if(currentSimType === SIM_TYPES.DAM && simTime >= 0.5){
+      if(currentSimType === SIM_TYPES.DAM && simTime >= 3.0){
         running = false;
         document.getElementById('btn-play-panel').textContent='▶ Run';
         document.getElementById('btn-play-mobile').textContent='▶ Run';
